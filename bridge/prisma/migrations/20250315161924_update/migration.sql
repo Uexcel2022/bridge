@@ -1,0 +1,11 @@
+-- AlterTable
+ALTER TABLE "Jobs" ALTER COLUMN "photo" DROP NOT NULL,
+ALTER COLUMN "email" DROP NOT NULL,
+ALTER COLUMN "status" SET DEFAULT true;
+
+-- AlterTable
+ALTER TABLE "applyForJob" ADD COLUMN     "coverLetter" TEXT,
+ADD COLUMN     "experience" INTEGER NOT NULL DEFAULT 0,
+ADD COLUMN     "linkedin" TEXT,
+ADD COLUMN     "quoteSalary" INTEGER NOT NULL DEFAULT 0,
+ALTER COLUMN "createdAt" SET DEFAULT CURRENT_TIMESTAMP;

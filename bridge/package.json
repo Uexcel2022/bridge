@@ -1,18 +1,20 @@
 {
   "name": "brigde",
   "version": "1.0.0",
-  "main": "index.js",
+  "main": "src/server.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "test:dev": "set NODE_ENV=dev && --watch src/index.js",
-    "start": "set NODE_ENV=prod && node --watch src/index.js"
+    "start:dev": "node --watch --env-file=config.env src/server.js",
+    "start:prod": "set NODE_ENV=prod && node --watch --env-file=config.env src/server.js"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "description": "",
+  "type": "module",
   "dependencies": {
     "@prisma/client": "^6.5.0",
+    "brigde": "file:",
     "express": "^4.21.2",
     "prisma": "^6.5.0"
   }
