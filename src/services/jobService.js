@@ -1,5 +1,4 @@
 import { PrismaClient } from "@prisma/client";
-import { join } from "@prisma/client/runtime/library";
 const prisma = new PrismaClient();
 
 export const postJob = async(job)=>{
@@ -10,6 +9,7 @@ export const postJob = async(job)=>{
                 summary: job.summary,
                 photo: job.photo,
                 jobDetails: job.jobDetails,
+                createdAt: new Date(Date.now()),
                 email: job.email,
                 user: {
                   connect: {id: job.userId},

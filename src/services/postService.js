@@ -7,6 +7,7 @@ export const newPost = async (post)=>{
         const newpst = await prisma.posts.create({
             data : {
                 text : post.text,
+                createdAt : new Date(Date.now()),
                 user : {
                     connect : {
                         id : post.userId

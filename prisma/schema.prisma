@@ -13,86 +13,114 @@ generator client {
   url      = env("DATABASE_URL")
 }
 
-model Users{
+model User{
  id Int @id @default(autoincrement())
- name String
+ surname String
+ firstName String
+ lastName String
  phoneNumber String @unique
- email String @unique
+ primaryEmail String @unique
+ email String[] @unique
  password String
- confirmPassword String 
+ confirmPassword String @ignore
  photo String?
  about String?
- qualification String []
- school String []
- cv String?
+ cv String[]
+ qualifications Qualifications[]
  posts Posts []
  comments Comment []
  jobs Jobs[]
  messages Messaging []
  applications applyForJob []
- createdAt DateTime @default(now())
+ createdAt DateTime
+ updatedAt DateTime?
+ notification Notification[]
+}
+
+model Qualifications{
+  id Int @id @default(autoincrement())
+  school String
+  qualification String
+  createdAt DateTime
+  updatedAt DateTime?
+  user User @relation(fields: [userId],references: [id])
+  userId Int
 }
 
 model Posts{
   id Int @id @default(autoincrement())
   text String
-  user Users @relation(fields: [userId],references: [id])
+  user User @relation(fields: [userId],references: [id],onDelete: Cascade)
   userId Int
   comments Comment []
-  createAt DateTime @default(now())
+  createAt DateTime 
+  updatedAt DateTime?
   
 }
 
 model Comment{
   id Int @id @default(autoincrement())
   text String
-  post Posts @relation(fields: [postId],references: [id])
-  user Users @relation(fields: [userId],references: [id])
+  post Posts @relation(fields: [postId],references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId],references: [id], onDelete: Cascade)
   userId Int
   postId Int
   createdAt DateTime
+  updatedAt DateTime?
 }
 
 model Jobs{
   id Int @id @default(autoincrement())
+  jobTitle String
   company String
   summary String
   photo String? 
   jobDetails String
   email String?
   status Boolean @default(true)
-  user Users @relation(fields: [userId], references: [id])
+  user User @relation(fields: [userId], references: [id])
   userId Int
   appplications applyForJob []
-  createdAt DateTime @default(now())
+  createdAt DateTime 
+  updatedAt DateTime?
 }
 
 model applyForJob{
   id Int @id @default(autoincrement())
+  name String
+  phoneNumber String
   coverLetter String?
   linkedin String?
   experience Int @default(0)
   quoteSalary Int @default(0)
-  cv String
-  job Jobs @relation(fields: [jobId],references: [id])
-  user Users @relation(fields: [userId],references: [id])
+  cv String[]
+  job Jobs @relation(fields: [jobId],references: [id],onDelete: Cascade)
+  user User @relation(fields: [userId],references: [id],onDelete: Cascade)
   userId Int
   jobId Int
-  createdAt DateTime @default(now())
+  createdAt DateTime 
+  updatedAt DateTime?
 
 }
 
 model Messaging{
   id Int @id @default(autoincrement())
   text String
-  user Users @relation(fields: [userId], references: [id])
+  user User @relation(fields: [userId], references: [id],onDelete: Cascade)
   userId Int
   createdAt DateTime
+  updatedAt DateTime?
 
 }
 
 model Notification{
   id Int @id @default(autoincrement())
   text String
+  user User @relation(fields: [userId], references: [id],onDelete: Cascade)
+  userId Int @unique
   createdAt DateTime
+  updatedAt DateTime?
 }
+
+
+
