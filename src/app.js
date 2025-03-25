@@ -8,6 +8,7 @@ import { jobAppRouter } from './routers/jobAppRouter.js';
 import { userRouter } from './routers/userRouter.js';
 import { globalErrorHandler } from './controller/errorController.js';
 import { qaulifRouter } from './routers/qaulfRouter.js'
+import { AppError } from './utils/appError.js';
 
 const app = express();
 app.use(express.json());
@@ -19,11 +20,9 @@ app.use('/api/v1/jobs/application',jobAppRouter)
 app.use('/api/v1/users',userRouter)
 app.use('/api/v1/qualification',qaulifRouter);
 
-app.all('/*',(req,resp)=>{
-    resp.status(404).json({
-        status: 'fail',
-        message: `The given URL ${req.originalUrl} not found!`
-    })
+app.all('/*',(req,resp,next)=>{
+    return next(new AppError(
+        `The given URL ${req.originalUrl} not found!`,404))
 })
 
 app.use(globalErrorHandler)

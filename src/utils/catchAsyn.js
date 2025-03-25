@@ -22,8 +22,13 @@ const catchDBAsync = fn => {
             throw new AppError(err.message, err.statusCode)
         }
 
-        if(err.name=='PrismaClientKnownRequestError'){
-            throw new AppError(err.meta.cause, err.statusCode)
+        if(err.code=='P2002'){
+            throw new AppError(`The ${err.meta.target} has been used.`, 400)
+        }
+
+        if(err.code=='P2025'){
+            const msg = err.meta.target || err.meta.cause
+            throw new AppError(`${err.meta.cause}`, 400)
         }
 
       }

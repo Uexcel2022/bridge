@@ -5,8 +5,12 @@ const globalErrorHandler = async(err,req,res,next)=>{
     err.status = err.status||'error'
     console.log(err.name);
 
-    if(err.name ==='PrismaClientValidationError'){
-        err = new AppError("fail",400)
+    if(err.name ==='JsonWebTokenError'){
+        err = new AppError('Invalid token. Please login again',401)
+    }
+
+    if(err.name ==='TokenExpiredError'){
+        err = new AppError('The Token is expired. Please login again',401)
     }
 
     if(process.env.NODE_ENV==='development'){
@@ -23,6 +27,21 @@ const globalErrorHandler = async(err,req,res,next)=>{
                 message: err.message,
                 error: err,
                 error: err.stack
+            })
+        }
+    }
+
+    if(process.env.NODE_ENV==='production'){
+        if(err.isOperational){
+            res.status(err.statusCode).json({
+                status: err.status,
+                message: err.message,
+            })
+        }else{
+            console.log(err)
+            res.status(500).json({
+                status: 'error',
+                message: 'Some went wrong!'
             })
         }
     }

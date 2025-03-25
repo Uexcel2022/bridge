@@ -15,7 +15,7 @@ generator client {
 
 model User{
  id Int @id @default(autoincrement())
- surname String
+ surname String 
  firstName String
  middleName String
  gender String

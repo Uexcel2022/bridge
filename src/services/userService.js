@@ -1,7 +1,6 @@
 import {PrismaClient} from '@prisma/client'
 import {catchDBAsync} from '.././utils/catchAsyn.js'
 import { AppError } from '../utils/appError.js';
-import { request } from 'express';
 const prisma = new PrismaClient();
 
 const createUser = catchDBAsync(async (user)=>{
@@ -13,17 +12,15 @@ const createUser = catchDBAsync(async (user)=>{
 
 const getUser = catchDBAsync(async (userId)=>{
     const id = userId*1;
-    const user = await prisma.user.findUnique({where:{id},include:{qualifications:true}})
+    const user = await prisma.user.findFirstOrThrow({where:{id},include:{qualifications:true}})
     if(!user){
         throw new AppError('User not found with that ID!',404)
     }
-
     return user;
 })
 
 const getUserByEmail = catchDBAsync(async (primaryEmail)=>{
-
-        const user = await prisma.user.findUnique({where:{primaryEmail},include:{qualifications:true}})
+    const user = await prisma.user.findUnique({where:{primaryEmail},include:{qualifications:true}})
         if(!user){
             throw new AppError(`User not found with email: ${primaryEmail}!`,404)
         }
