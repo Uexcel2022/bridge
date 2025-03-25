@@ -1,5 +1,4 @@
-import { userAddEmail,removeUserEmail,createUserQualif
-    ,updateQualif,deleteQualif,userUpdateAbout,userUpdateName} from "../services/userService.js";
+import { userAddEmail,removeUserEmail,userUpdateAbout,userUpdateName} from "../services/userService.js";
 
 export const createUserQualifications = async(req,resp,next)=>{
     try{

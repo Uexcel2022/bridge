@@ -1,6 +1,7 @@
 import {addUserEmail,userEmailRemoval,createUserQualifications,
     qualificationsUpdate,qualificationsDeletion,updateAbout} from '../controller/userController.js'
 import express from 'express';
+
 const userRouter = express();
 
 userRouter.patch('/email/:id/add',addUserEmail);

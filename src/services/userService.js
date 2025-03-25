@@ -1,51 +1,59 @@
 import {PrismaClient} from '@prisma/client'
+import {catchDBAsync} from '.././utils/catchAsyn.js'
+import { AppError } from '../utils/appError.js';
+import { request } from 'express';
 const prisma = new PrismaClient();
 
-export const createUser = async (user)=>{
-    try{
-    const newUsr = await prisma.users.create({
+const createUser = catchDBAsync(async (user)=>{
+    const newUsr = await prisma.user.create({
         data : user
     })
-
     return newUsr;
+})
 
-    }catch(err){
-        console.log(err)
-        throw err;
+const getUser = catchDBAsync(async (userId)=>{
+    const id = userId*1;
+    const user = await prisma.user.findUnique({where:{id},include:{qualifications:true}})
+    if(!user){
+        throw new AppError('User not found with that ID!',404)
     }
-}
 
-export const userUpdateName = async (id,names)=>{
-    try{
+    return user;
+})
+
+const getUserByEmail = catchDBAsync(async (primaryEmail)=>{
+
+        const user = await prisma.user.findUnique({where:{primaryEmail},include:{qualifications:true}})
+        if(!user){
+            throw new AppError(`User not found with email: ${primaryEmail}!`,404)
+        }
+    return user;
+})
+
+const userUpdateName = catchDBAsync(async (id,names)=>{
     const updatedUser = await prisma.$transaction( async (prisma)=>{
-        
         const user = await prisma.users.findUnique(id);
         if(!user){
-            throw new Error('User not found that ID!')
+            throw new AppError('User not found with that ID!')
         }
         return prisma.update({
             where: {id},
             data: {
                 surname: names.surname,
                 firstName: names.firstName,
-                lastName: names.lastName
+                lastName: names.lastName,
             }
         })
     })
 
     return updatedUser;
-    }catch(err){
-        console.log(err)
-        throw err;
-    }
-}
+})
 
-export const userUpdateAbout = async (updateData)=>{
-    try{
+const userUpdateAbout = catchDBAsync (async (updateData)=>{
     const updatedUser = await prisma.$transaction( async (prisma)=>{
         const user = await prisma.users.findUnique({where:{id: updateData.userId}});
         if(!user){
-            throw new Error('User not found that ID!')
+            throw new AppError('User not found with that ID!',404)
         }
         return prisma.users.update({
             where: {id: updateData.userId},
@@ -56,18 +64,13 @@ export const userUpdateAbout = async (updateData)=>{
         })
     })
     return updatedUser;
-    }catch(err){
-        console.log(err)
-        throw err;
-    }
-}
+})
 
-export const userUpdatePhoneNumber = async (id,phoneNumber)=>{
-    try{
+const userUpdatePhoneNumber = catchDBAsync(async (id,phoneNumber)=>{
     const updatedUser = await prisma.$transaction( async (prisma)=>{
         const user = await prisma.users.findUnique(id);
         if(!user){
-            throw new Error('User not found that ID!')
+            throw new AppError('User not found with that ID!',404)
         }
         return prisma.update({
             where: {id},
@@ -78,18 +81,13 @@ export const userUpdatePhoneNumber = async (id,phoneNumber)=>{
     })
 
     return updatedUser;
-    }catch(err){
-        console.log(err)
-        throw err;
-    }
-}
+})
 
-export const userUpdatePhoto = async (id,photo)=>{
-    try{
+const userUpdatePhoto = catchDBAsync(async (id,photo)=>{
     const updatedUser = await prisma.$transaction( async (prisma)=>{
         const user = await prisma.users.findUnique(id);
         if(!user){
-            throw new Error('User not found that ID!')
+            throw new AppError('User not found with that ID!',404)
         }
         return prisma.update({
             where: {id},
@@ -100,77 +98,15 @@ export const userUpdatePhoto = async (id,photo)=>{
     })
 
     return updatedUser;
-    }catch(err){
-        console.log(err)
-        throw err;
-    }
-}
+})
 
-export const createUserQualif = async (userQualf)=>{
-    try{
-        const userNewQul = await prisma.qualifications.create({
-            data:{
-                school: userQualf.school,
-                qualification: userQualf.qualification,
-                createdAt: userQualf.createdAt,
-                user:{
-                    connect: {id: userQualf.userId}
-                }
-            },
-            include :{user: userQualf.userId}
-        })
-        return userNewQul
-    }catch(err){
-        console.log(err)
-        throw err;
-    }
-}
-
-export const updateQualif = async (userQualf)=>{
-    try{
-        const userupdatedQual = await prisma.$transaction(async(prisma)=>{
-            const qualif = await prisma.qualifications.findUnique({where: {id:userQualf.qfId}})
-            if(!qualif){
-                throw new Error('No Qualification found with that ID')
-            }
-             
-            return prisma.qualifications.update({
-                where: {id:userQualf.qfId},
-                data:{
-                    school: userQualf.school,
-                    qualification: userQualf.qualification,
-                    updatedAt: userQualf.updatedAt,
-                    user:{
-                        connect: {id: userQualf.userId}
-                    }
-                },
-                include :{user: userQualf.userId}
-            })
-        })
-        return userupdatedQual
-    }catch(err){
-        console.log(err)
-        throw err;
-    }
-}
-
-export const deleteQualif = async (qalfId)=>{
-    try{
-        await prisma.qualifications.delete({where: {id: qalfId}})
-    }catch(err){
-        console.log(err)
-        throw err;
-    }
-}
-
-export const userAddEmail = async (id,email)=>{
-    try{
+const userAddEmail = catchDBAsync(async (id,email)=>{
     const updatedUser = await prisma.$transaction( async (prisma)=>{
         const user = await prisma.users.findUnique({where:{id}});
         if(!user){
-            throw new Error('User not found that ID')
+            throw new AppError('User not found with that ID',404)
         }
-        user.email.map(el=>email.push(el))
+        user.email.map(el=>{if(!email.includes(el)&&user.primaryEmail!==el){email.push(el)}})
 
         return prisma.users.update({
             where: {id},
@@ -180,18 +116,13 @@ export const userAddEmail = async (id,email)=>{
         })
     })
     return updatedUser;
-    }catch(err){
-        console.log(err)
-        throw err;
-    }
-}
+})
 
-export const removeUserEmail = async (id,email)=>{
-    try{
+const removeUserEmail = catchDBAsync( async (id,email)=>{
     const updatedUser = await prisma.$transaction( async (prisma)=>{
         const user = await prisma.users.findUnique({where:{id}});
         if(!user){
-            throw new Error('User not found that ID')
+            throw new AppError('User not found with that ID',404)
         }
         const updatedEmail = user.email.filter(el=>!email.includes(el))
 
@@ -202,13 +133,12 @@ export const removeUserEmail = async (id,email)=>{
             }
         })
     })
+
     return updatedUser;
-    }catch(err){
-        console.log(err)
-        throw err;
-    }
+})
 
-
+export {
+    createUser,userUpdateName,userUpdateAbout,getUser,getUserByEmail,
+    removeUserEmail,userAddEmail,userUpdatePhoneNumber,userUpdatePhoto
 }
-
 

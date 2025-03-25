@@ -17,12 +17,13 @@ model User{
  id Int @id @default(autoincrement())
  surname String
  firstName String
- lastName String
+ middleName String
+ gender String
  phoneNumber String @unique
  primaryEmail String @unique
  email String[] @unique
  password String
- confirmPassword String @ignore
+ confirmPassword String
  photo String?
  about String?
  cv String[]
@@ -35,6 +36,7 @@ model User{
  createdAt DateTime
  updatedAt DateTime?
  notification Notification[]
+ passwordChangeAt DateTime?
 }
 
 model Qualifications{
@@ -71,7 +73,7 @@ model Comment{
 
 model Jobs{
   id Int @id @default(autoincrement())
-  jobTitle String
+  jobTitle String @default("V")
   company String
   summary String
   photo String? 
