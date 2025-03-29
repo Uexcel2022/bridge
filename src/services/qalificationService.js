@@ -32,7 +32,7 @@ const updateQualif = catchDBAsync(async (userQualf)=>{
                 data:{
                     school: userQualf.school,
                     qualification: userQualf.qualification,
-                    updatedAt: userQualf.updatedAt,
+                    updatedAt: new Date(Date.now()),
                     user:{
                         connect: {id: userQualf.userId}
                     }

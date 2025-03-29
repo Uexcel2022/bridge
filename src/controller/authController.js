@@ -1,5 +1,5 @@
 import {AppError} from '../utils/appError.js'
-import { createUser,getUser, getUserByEmail, } from "../services/userService.js";
+import { createUser,getUser, getUserByEmail,pwdChange } from "../services/userService.js";
 import {userValidation,options} from '../validation/userValidation.js'
 import {catchReqResAsync} from '.././utils/catchAsyn.js'
 import {promisify} from 'util'
@@ -59,7 +59,8 @@ const protect = catchReqResAsync(async(req,resp,next)=>{
     }
     
     if(!token){
-        return new AppError('You are not logged in. Please login to continue!',401)
+        return next(
+            new AppError('You are not logged in. Please login to continue!',401))
     }
 
     const docodedToken = await promisify(jwt.verify)(token,process.env.JWT_SECRET)
@@ -77,43 +78,29 @@ const protect = catchReqResAsync(async(req,resp,next)=>{
       }
     }
 
+    user.password = null;
     req.user = user
     next()
 })
 
-
-
-
-
-
-
-
-
-
+const restrictTo = (...roles)=>{
+    return(req,resp,next)=>{
+        if(!roles.includes('employer')){
+            return next(new AppError(
+                'You do not have permission to perform this action',403)
+            )
+        }
+        next();
+    }
+}
 
 
 const getMe = catchReqResAsync(async (req,resp, next)=>{
-    if(!req.params.id){
+    if(!req.user.id){
         return next(new AppError('Somwthing went wrong!',500));
      }
-    const newUser = await getUser(req.params.id);
-    resp.status(200).json({
-        satatus: 'success',
-        data: {
-            user : newUser
-        }
-    })
-})
-
-const fetchUserByEmail = catchReqResAsync(async (req,resp, next)=>{
-     if(!req.body.primaryEmail){
-        return next(new AppError('Please provide email address!',400));
-     }
-    const user = await getUserByEmail(req.body.primaryEmail);
-
-    if(!user){
-        return next(new AppError(`No user found with is email: ${req.body.primaryEmail}`,404))
-    }
+    const user = await getUser(req.user.id);
+    user.password = null
     resp.status(200).json({
         satatus: 'success',
         data: {
@@ -122,4 +109,68 @@ const fetchUserByEmail = catchReqResAsync(async (req,resp, next)=>{
     })
 })
 
-export {getMe,signup,fetchUserByEmail,login,protect}
+const fetchUserByEmail = catchReqResAsync(async (req,resp, next)=>{
+
+    const primaryEmail =  req.body.primaryEmail;
+
+     if(!primaryEmail){
+        return next(new AppError('Please provide email address!',400));
+     }
+    const user = await getUserByEmail(primaryEmail);
+
+    if(!user){
+        return next(new AppError(`No user found with this email: ${primaryEmail}`,404))
+    }
+    user.password = null
+
+    resp.status(200).json({
+        satatus: 'success',
+        data: {
+            user
+        }
+    })
+})
+
+const changePwd = catchReqResAsync(async (req,resp,next)=>{
+     
+
+    if(!req.user.id){
+        return next(new AppError('Somwthing went wrong!',500));
+     }
+    
+    const {oldPassword,newPassword, comfirmPassword} = req.body
+    if(!oldPassword||!newPassword ||!comfirmPassword){
+        return next(new AppError(
+            'Please provide oldPassword, newPassword and comfirmPassword.',404))
+    }
+
+    if(comfirmPassword !== newPassword){
+        return next(new AppError('Passwords are not the same.',400))
+    }
+    let user = await getUser(req.user.id);
+
+    if(!await bcrypt.compare(oldPassword,user.password)){
+        return next('Invalid password!',400)
+    }
+    
+    const hashedPwd  = await bcrypt.hash(newPassword,12)
+
+    user.password = hashedPwd
+    user.passwordChangeAt = new Date(Date.now())
+
+    user =  await pwdChange(user)
+
+    user.password = null
+
+    resp.status(200).json({
+        satatus: 'success',
+        data: {
+            user
+        }
+    })
+})
+
+
+
+
+export {getMe,signup,changePwd,fetchUserByEmail,login,protect,restrictTo}

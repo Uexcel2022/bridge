@@ -24,7 +24,7 @@ const searchJob = catchReqResAsync(async(req,resp,next)=>{
 })
 
 const getJobsAndApplications = catchReqResAsync(async(req,resp,next)=>{
-    const results = await findPostedJobsandApplications(18);
+    let results = await findPostedJobsandApplications(req.params.jobId*1);
     resp.status(200).json({
         status: 'success',
         data:{

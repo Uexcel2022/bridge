@@ -18,7 +18,7 @@ app.use('/api/v1/posts',postRouter);
 app.use('/api/v1/jobs',jobRouter);
 app.use('/api/v1/jobs/application',jobAppRouter)
 app.use('/api/v1/users',userRouter)
-app.use('/api/v1/qualification',qaulifRouter);
+app.use('/api/v1/users/qualifications',qaulifRouter);
 
 app.all('/*',(req,resp,next)=>{
     return next(new AppError(

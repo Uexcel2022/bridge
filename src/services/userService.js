@@ -11,8 +11,11 @@ const createUser = catchDBAsync(async (user)=>{
 })
 
 const getUser = catchDBAsync(async (userId)=>{
-    const id = userId*1;
-    const user = await prisma.user.findUnique({where:{id},include:{qualifications:true}})
+    const id = userId
+    const user = await prisma.user.findUnique(
+        {where:{id},
+        include:{qualifications:true}
+    })
     if(!user){
         throw new AppError('User not found with that ID!',404)
     }
@@ -20,10 +23,17 @@ const getUser = catchDBAsync(async (userId)=>{
 })
 
 const getUserByEmail = catchDBAsync(async (primaryEmail)=>{
-    const user = await prisma.user.findUnique({where:{primaryEmail},include:{qualifications:true}})
-        if(!user){
-            throw new AppError(`User not found with email: ${primaryEmail}!`,404)
-        }
+
+    const user = await prisma.user.findUnique(
+        {where:{
+            primaryEmail
+        },
+        include:{qualifications:true}
+    })
+
+    if(!user){
+        throw new AppError(`User not found with email: ${primaryEmail}!`,404)
+    }
     return user;
 })
 
@@ -121,8 +131,15 @@ const removeUserEmail = catchDBAsync( async (id,email)=>{
         if(!user){
             throw new AppError('User not found with that ID',404)
         }
+        const lng = user.email.length
+        if(lng < 1){
+            throw new AppError('You have no email in your email collections',400); 
+        }
         const updatedEmail = user.email.filter(el=>!email.includes(el))
 
+        if(lng === updatedEmail.length){
+            throw new AppError('The email does not exist in your email collections',404);
+        }
         return prisma.users.update({
             where: {id},
             data: {
@@ -134,8 +151,23 @@ const removeUserEmail = catchDBAsync( async (id,email)=>{
     return updatedUser;
 })
 
+const pwdChange = catchDBAsync (async (user)=>{
+    const updatedUser = await prisma.$transaction( async (prisma)=>{
+        return prisma.user.update({
+            where: {id: user.id},
+            data: {
+                password: user.password,
+                passwordChangeAt: user.passwordChangeAt
+            }
+        })
+    })
+    return updatedUser;
+})
+
 export {
     createUser,userUpdateName,userUpdateAbout,getUser,getUserByEmail,
-    removeUserEmail,userAddEmail,userUpdatePhoneNumber,userUpdatePhoto
+    removeUserEmail,userAddEmail,userUpdatePhoneNumber,userUpdatePhoto,
+    pwdChange
+    
 }
 

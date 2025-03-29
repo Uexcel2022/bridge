@@ -10,7 +10,7 @@ const globalErrorHandler = async(err,req,res,next)=>{
     }
 
     if(err.name ==='TokenExpiredError'){
-        err = new AppError('The Token is expired. Please login again',401)
+        err = new AppError('The Token has expired. Please login again',401)
     }
 
     if(process.env.NODE_ENV==='development'){

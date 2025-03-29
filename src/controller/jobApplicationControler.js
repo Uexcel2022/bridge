@@ -10,6 +10,7 @@ export const applyForJob = catchReqResAsync( async (req,resp,next)=>{
     body.cv = 'udokaresume.pdf'
     body.phoneNumber = '07038253621'
     const newApp = await createJobApp(body);
+    newApp.user.password = null;
     resp.status(201).json({
         status: 'success',
         data:{
