@@ -1,24 +1,20 @@
 
-import { jobApp } from "../services/JobApplicationService.js";
+import { createJobApp } from "../services/JobApplicationService.js";
+import {catchReqResAsync} from '../utils/catchAsyn.js'
 
-export const applyForJob = async (req,resp,next)=>{
-    try{
-        const body = req.body;
-        body.phoneNumber ='182922920020';
-        body.name = 'jame brown';
-        body.cv = '/cv/id/jamecv.pdf';
-        body.jobId = 1;
-        body.userId = 5;
-        const newApp = await jobApp(body);
-        resp.status(201).json({
-            status: 'success',
-            data:{
-                application: newApp
-            }
-        })
-    }catch(err){
-        console.log(err)
-        throw new Error(err);
-    }
-
-}
+export const applyForJob = catchReqResAsync( async (req,resp,next)=>{
+    const body = req.body;
+    body.name = 'Uche Samuel'
+    body.userId = 1
+    body.jobId = req.params.id*1
+    body.cv = 'udokaresume.pdf'
+    body.phoneNumber = '07038253621'
+    const newApp = await createJobApp(body);
+    resp.status(201).json({
+        status: 'success',
+        data:{
+            application: newApp
+        }
+    })
+   
+})

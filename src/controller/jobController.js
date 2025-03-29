@@ -1,16 +1,37 @@
-import { postJob } from "../services/jobService.js";
+import { postJob,jobSearch, findPostedJobsandApplications} from "../services/jobService.js";
+import {catchReqResAsync} from '../utils/catchAsyn.js'
 
-export const createJob = async(req,resp,next)=>{
-    try{
-        const newJob = await postJob(req.body);
-        resp.status(201).json({
-            status: 'success',
-            data:{
-                job: newJob
-            }
-        })
-    }catch(err){
-        console.log(err)
-        throw new Error(err);
-    }
-}
+const createJob = catchReqResAsync(async(req,resp,next)=>{
+    const newJob = await postJob(req.body);
+    resp.status(201).json({
+        status: 'success',
+        data:{
+            job: newJob
+        }
+    })
+    
+})
+
+const searchJob = catchReqResAsync(async(req,resp,next)=>{
+    const results = await jobSearch(req.body.jobTitle);
+    resp.status(200).json({
+        status: 'success',
+        data:{
+            jobs: results
+        }
+    })
+    
+})
+
+const getJobsAndApplications = catchReqResAsync(async(req,resp,next)=>{
+    const results = await findPostedJobsandApplications(18);
+    resp.status(200).json({
+        status: 'success',
+        data:{
+            jobs: results
+        }
+    })
+    
+})
+
+export {createJob,searchJob,getJobsAndApplications}

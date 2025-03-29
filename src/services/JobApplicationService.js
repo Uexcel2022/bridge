@@ -1,8 +1,8 @@
 import { PrismaClient } from "@prisma/client";
+import {catchDBAsync} from '../utils/catchAsyn.js'
 const prisma = new PrismaClient()
 
-export const jobApp = async (applicant)=>{
-   try{
+const createJobApp = catchDBAsync( async(applicant)=>{
     const newJobApp = await prisma.applyForJob.create({
         data: {
             name: applicant.name,
@@ -23,8 +23,8 @@ export const jobApp = async (applicant)=>{
         }
     })
     return newJobApp;
-   }catch(err){
-    console.log(err);
-    throw err
-   }
-}
+})
+
+
+
+export {createJobApp,}
