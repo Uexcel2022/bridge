@@ -4,7 +4,7 @@ import express from 'express';
 import {authRouter} from './routers/authRouter.js'
 import {postRouter} from './routers/postRoute.js'
 import { jobRouter } from './routers/jobRouter.js';
-import { jobAppRouter } from './routers/jobAppRouter.js';
+import { jobAppRouter} from './routers/jobAppRouter.js';
 import { userRouter } from './routers/userRouter.js';
 import { globalErrorHandler } from './controller/errorController.js';
 import { qaulifRouter } from './routers/qaulfRouter.js'

@@ -1,13 +1,16 @@
 import express from 'express'
-import { signup, getMe,fetchUserByEmail,login,protect,changePwd } from '../controller/authController.js'
+import { signup, getMe,fetchUserByEmail,
+    login,protect,changePwd } from '../controller/authController.js'
 
 const authRouter = express.Router()
 
-authRouter.post('/signup',signup);
-authRouter.get('/me', protect,getMe);
-authRouter.post('/email',protect,fetchUserByEmail)
 authRouter.post('/login',login)
-authRouter.post('/changePassword',protect,changePwd)
+authRouter.post('/signup',signup);
 
+authRouter.use(protect)
+
+authRouter.get('/me',getMe);
+authRouter.post('/email',fetchUserByEmail)
+authRouter.post('/changePassword',changePwd)
 
 export {authRouter}

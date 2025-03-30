@@ -1,17 +1,13 @@
-import {addUserEmail,userEmailRemoval,createUserQualifications,
-    qualificationsUpdate,qualificationsDeletion,updateAbout} from '../controller/userController.js'
+import {addUserEmail,userEmailRemoval,updateAbout} from '../controller/userController.js'
 import express from 'express';
+import {protect,restrictTo} from '../controller/authController.js'
 
 const userRouter = express();
 
-userRouter.patch('/email/:id/add',addUserEmail);
-userRouter.patch('/email/:id/remove',userEmailRemoval);
+userRouter.use(protect,restrictTo('user','employer'))
 
-// userRouter.post('/qaulifications',createUserQualifications);
-// userRouter.route('/qaulifications/:id')
-// .put(qualificationsUpdate)
-// .delete(qualificationsDeletion)
-
+userRouter.patch('/email/add',addUserEmail);
+userRouter.patch('/email/remove',userEmailRemoval);
 userRouter.patch('/about',updateAbout)
 
 

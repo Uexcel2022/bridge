@@ -8,9 +8,9 @@ function catchReqResAsync(fn){
 }
 
 const catchDBAsync = fn => {
-      return async (qualifs)=>{
+      return async (value)=>{
     try{
-        return await fn(qualifs);
+        return await fn(value);
       }catch(err){
         console.log(err);
         if(err.name==='PrismaClientValidationError'){

@@ -23,7 +23,7 @@ model User{
  primaryEmail String @unique
  email String[] @unique
  password String
- confirmPassword String
+ role String
  photo String?
  about String?
  cv String[]

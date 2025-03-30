@@ -1,14 +1,13 @@
-import { createJob,searchJob,getJobsAndApplications } from '../controller/jobController.js';
+import { createJob,searchJob,getPostedJobs } from '../controller/jobController.js';
 import {protect,restrictTo} from '../controller/authController.js'
 import express from 'express'
 const jobRouter = express.Router();
 
-jobRouter.route('/')
-.post(createJob)
-.get(searchJob)
+jobRouter.route('/').get(searchJob)
+.post(protect,restrictTo('employer'),createJob);
 
-jobRouter.use(protect,restrictTo('employer'))
-jobRouter.route('/:jobId')
-.get(getJobsAndApplications)
+jobRouter.route('/posted')
+.get(protect,restrictTo('employer'),getPostedJobs)
+
 
 export {jobRouter}

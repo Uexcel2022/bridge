@@ -18,13 +18,21 @@ const createJobApp = catchDBAsync( async(applicant)=>{
              }
         },
         include:{
-            user: true,
             job: true
         }
     })
     return newJobApp;
 })
 
+const getJobApplications = catchDBAsync(async(id)=>{
+
+    const rs = await prisma.applyForJob.findMany(
+        {where: {
+            jobId : id
+        }
+    })
+   return rs;
+})
 
 
-export {createJobApp,}
+export {createJobApp,getJobApplications}

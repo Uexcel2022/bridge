@@ -4,6 +4,7 @@ import { AppError } from '../utils/appError.js';
 const prisma = new PrismaClient();
 
 const createUser = catchDBAsync(async (user)=>{
+    user.role = 'user'
     const newUsr = await prisma.user.create({
         data : user
     })
@@ -39,7 +40,7 @@ const getUserByEmail = catchDBAsync(async (primaryEmail)=>{
 
 const userUpdateName = catchDBAsync(async (id,names)=>{
     const updatedUser = await prisma.$transaction( async (prisma)=>{
-        const user = await prisma.users.findUnique(id);
+        const user = await prisma.user.findUnique(id);
         if(!user){
             throw new AppError('User not found with that ID!')
         }
@@ -62,7 +63,7 @@ const userUpdateAbout = catchDBAsync (async (updateData)=>{
         if(!user){
             throw new AppError('User not found with that ID!',404)
         }
-        return prisma.users.update({
+        return prisma.user.update({
             where: {id: updateData.userId},
             data: {
                 about: updateData.about,
@@ -75,7 +76,7 @@ const userUpdateAbout = catchDBAsync (async (updateData)=>{
 
 const userUpdatePhoneNumber = catchDBAsync(async (id,phoneNumber)=>{
     const updatedUser = await prisma.$transaction( async (prisma)=>{
-        const user = await prisma.users.findUnique(id);
+        const user = await prisma.user.findUnique(id);
         if(!user){
             throw new AppError('User not found with that ID!',404)
         }
@@ -92,7 +93,7 @@ const userUpdatePhoneNumber = catchDBAsync(async (id,phoneNumber)=>{
 
 const userUpdatePhoto = catchDBAsync(async (id,photo)=>{
     const updatedUser = await prisma.$transaction( async (prisma)=>{
-        const user = await prisma.users.findUnique(id);
+        const user = await prisma.user.findUnique(id);
         if(!user){
             throw new AppError('User not found with that ID!',404)
         }
@@ -107,16 +108,17 @@ const userUpdatePhoto = catchDBAsync(async (id,photo)=>{
     return updatedUser;
 })
 
-const userAddEmail = catchDBAsync(async (id,email)=>{
+const userAddEmail = catchDBAsync( async (updateObj)=>{
     const updatedUser = await prisma.$transaction( async (prisma)=>{
-        const user = await prisma.users.findUnique({where:{id}});
+        const email = updateObj.email;
+        const user = await prisma.user.findUnique({where:{id:updateObj.id}});
         if(!user){
             throw new AppError('User not found with that ID',404)
         }
-        user.email.map(el=>{if(!email.includes(el)&&user.primaryEmail!==el){email.push(el)}})
+        user.email.map(el=>{if(!email.includes(el) && user.primaryEmail!==el){email.push(el)}})
 
-        return prisma.users.update({
-            where: {id},
+        return prisma.user.update({
+            where: {id: updateObj.id},
             data: {
               email
             }
@@ -125,9 +127,10 @@ const userAddEmail = catchDBAsync(async (id,email)=>{
     return updatedUser;
 })
 
-const removeUserEmail = catchDBAsync( async (id,email)=>{
+const removeUserEmail = catchDBAsync( async (updateObj)=>{
     const updatedUser = await prisma.$transaction( async (prisma)=>{
-        const user = await prisma.users.findUnique({where:{id}});
+        const user = await prisma.user.findUnique({where:{id: updateObj.id}});
+        const email = updateObj.email;
         if(!user){
             throw new AppError('User not found with that ID',404)
         }
@@ -140,8 +143,8 @@ const removeUserEmail = catchDBAsync( async (id,email)=>{
         if(lng === updatedEmail.length){
             throw new AppError('The email does not exist in your email collections',404);
         }
-        return prisma.users.update({
-            where: {id},
+        return prisma.user.update({
+            where: {id: updateObj.id},
             data: {
               email: updatedEmail,
             }

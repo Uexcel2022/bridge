@@ -2,7 +2,6 @@ import {PrismaClient} from '@prisma/client'
 const prisma = new PrismaClient();
 
 export const newPost = async (post)=>{
-    console.log(post)
     try{
         const newpst = await prisma.posts.create({
             data : {

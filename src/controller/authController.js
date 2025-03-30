@@ -19,6 +19,7 @@ const signup = catchReqResAsync(async (req,resp, next)=>{
     const hashedPwd = await bcrypt.hash(req.body.password,12);
     req.body.password = hashedPwd;
     req.body.createdAt = new Date(Date.now())
+    req.body.confirmPassword = undefined;
     const newUser = await createUser(req.body);
     resp.status(201).json({
         satatus: 'success',
@@ -85,7 +86,7 @@ const protect = catchReqResAsync(async(req,resp,next)=>{
 
 const restrictTo = (...roles)=>{
     return(req,resp,next)=>{
-        if(!roles.includes('employer')){
+        if(!roles.includes(req.user.role)){
             return next(new AppError(
                 'You do not have permission to perform this action',403)
             )

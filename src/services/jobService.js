@@ -27,7 +27,8 @@ const jobSearch = catchDBAsync(async(val)=>{
     const rs = await prisma.jobs.findMany(
         {where: {
             jobTitle:{
-                contains: val
+                contains: val,
+                mode: 'insensitive'
             }
         },
         include: {user: true},
@@ -36,17 +37,26 @@ const jobSearch = catchDBAsync(async(val)=>{
 })
 
 
-const findPostedJobsandApplications = catchDBAsync(async(id)=>{
+
+
+const findPostedJobs = catchDBAsync(async(id)=>{
     const rs = await prisma.jobs.findMany(
-        {where: {
+        { where: {
             userId : id
         },
-        include:{
-           applicant: true
-        }
     })
    return rs;
 })
 
 
-export {postJob,jobSearch,findPostedJobsandApplications}
+const findAllPostedJobs = catchDBAsync(async(id)=>{
+    const rs = await prisma.jobs.findMany(
+        { where: {
+            userId : id
+        },
+    })
+   return rs;
+})
+
+
+export {postJob,jobSearch,findPostedJobs,findAllPostedJobs}
