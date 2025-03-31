@@ -4,6 +4,7 @@ import { AppError } from "../utils/appError.js";
 import {catchReqResAsync} from '../utils/catchAsyn.js'
 
 export const applyForJob = catchReqResAsync( async (req,resp,next)=>{
+    //would have to send below info from from end will applying for a job
     const body = req.body;
     body.name = `${req.user.firstName} ${req.user.middleName}`
     body.userId = req.user.id

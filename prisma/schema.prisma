@@ -36,6 +36,8 @@ model User{
  createdAt DateTime
  updatedAt DateTime?
  notification Notification[]
+ passwordChangeToken String?
+ passwordChangeTokenExpires DateTime?
  passwordChangeAt DateTime?
 }
 
@@ -49,27 +51,6 @@ model Qualifications{
   userId Int
 }
 
-model Posts{
-  id Int @id @default(autoincrement())
-  text String
-  user User @relation(fields: [userId],references: [id],onDelete: Cascade)
-  userId Int
-  comments Comment []
-  createAt DateTime 
-  updatedAt DateTime?
-  
-}
-
-model Comment{
-  id Int @id @default(autoincrement())
-  text String
-  post Posts @relation(fields: [postId],references: [id], onDelete: Cascade)
-  user User @relation(fields: [userId],references: [id], onDelete: Cascade)
-  userId Int
-  postId Int
-  createdAt DateTime
-  updatedAt DateTime?
-}
 
 model Jobs{
   id Int @id @default(autoincrement())
@@ -102,6 +83,28 @@ model ApplyForJob{
   createdAt DateTime 
   updatedAt DateTime?
 
+}
+
+model Posts{
+  id Int @id @default(autoincrement())
+  text String
+  user User @relation(fields: [userId],references: [id],onDelete: Cascade)
+  userId Int
+  comments Comment []
+  createAt DateTime 
+  updatedAt DateTime?
+  
+}
+
+model Comment{
+  id Int @id @default(autoincrement())
+  text String
+  post Posts @relation(fields: [postId],references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId],references: [id], onDelete: Cascade)
+  userId Int
+  postId Int
+  createdAt DateTime
+  updatedAt DateTime?
 }
 
 model Messaging{

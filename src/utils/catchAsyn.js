@@ -12,7 +12,6 @@ const catchDBAsync = fn => {
     try{
         return await fn(value);
       }catch(err){
-        console.log(err);
         if(err.name==='PrismaClientValidationError'){
             const msg = err.message.split(/Argument|argument/)[1]
             .replace(':','').replace("`",'').replace("`",'');

@@ -1,9 +1,10 @@
 import {PrismaClient} from '@prisma/client'
 import {catchDBAsync} from '.././utils/catchAsyn.js'
 import { AppError } from '../utils/appError.js';
+import crypto  from 'crypto'
 const prisma = new PrismaClient();
 
-const createUser = catchDBAsync(async (user)=>{
+export const createUser = catchDBAsync(async (user)=>{
     user.role = 'user'
     const newUsr = await prisma.user.create({
         data : user
@@ -11,7 +12,7 @@ const createUser = catchDBAsync(async (user)=>{
     return newUsr;
 })
 
-const getUser = catchDBAsync(async (userId)=>{
+export const getUser = catchDBAsync(async (userId)=>{
     const id = userId
     const user = await prisma.user.findUnique(
         {where:{id},
@@ -23,7 +24,7 @@ const getUser = catchDBAsync(async (userId)=>{
     return user;
 })
 
-const getUserByEmail = catchDBAsync(async (primaryEmail)=>{
+export const getUserByEmail = catchDBAsync(async (primaryEmail)=>{
 
     const user = await prisma.user.findUnique(
         {where:{
@@ -38,13 +39,13 @@ const getUserByEmail = catchDBAsync(async (primaryEmail)=>{
     return user;
 })
 
-const userUpdateName = catchDBAsync(async (id,names)=>{
+export const userUpdateName = catchDBAsync(async (id,names)=>{
     const updatedUser = await prisma.$transaction( async (prisma)=>{
         const user = await prisma.user.findUnique(id);
         if(!user){
             throw new AppError('User not found with that ID!')
         }
-        return prisma.update({
+        return await prisma.update({
             where: {id},
             data: {
                 surname: names.surname,
@@ -57,13 +58,13 @@ const userUpdateName = catchDBAsync(async (id,names)=>{
     return updatedUser;
 })
 
-const userUpdateAbout = catchDBAsync (async (updateData)=>{
+export const userUpdateAbout = catchDBAsync (async (updateData)=>{
     const updatedUser = await prisma.$transaction( async (prisma)=>{
         const user = await prisma.users.findUnique({where:{id: updateData.userId}});
         if(!user){
             throw new AppError('User not found with that ID!',404)
         }
-        return prisma.user.update({
+        return await prisma.user.update({
             where: {id: updateData.userId},
             data: {
                 about: updateData.about,
@@ -74,13 +75,13 @@ const userUpdateAbout = catchDBAsync (async (updateData)=>{
     return updatedUser;
 })
 
-const userUpdatePhoneNumber = catchDBAsync(async (id,phoneNumber)=>{
+export const userUpdatePhoneNumber = catchDBAsync(async (id,phoneNumber)=>{
     const updatedUser = await prisma.$transaction( async (prisma)=>{
         const user = await prisma.user.findUnique(id);
         if(!user){
             throw new AppError('User not found with that ID!',404)
         }
-        return prisma.update({
+        return await prisma.update({
             where: {id},
             data: {
                 phoneNumber,
@@ -91,13 +92,13 @@ const userUpdatePhoneNumber = catchDBAsync(async (id,phoneNumber)=>{
     return updatedUser;
 })
 
-const userUpdatePhoto = catchDBAsync(async (id,photo)=>{
+export const userUpdatePhoto = catchDBAsync(async (id,photo)=>{
     const updatedUser = await prisma.$transaction( async (prisma)=>{
         const user = await prisma.user.findUnique(id);
         if(!user){
             throw new AppError('User not found with that ID!',404)
         }
-        return prisma.update({
+        return await prisma.update({
             where: {id},
             data: {
                 photo,
@@ -108,7 +109,7 @@ const userUpdatePhoto = catchDBAsync(async (id,photo)=>{
     return updatedUser;
 })
 
-const userAddEmail = catchDBAsync( async (updateObj)=>{
+export const userAddEmail = catchDBAsync( async (updateObj)=>{
     const updatedUser = await prisma.$transaction( async (prisma)=>{
         const email = updateObj.email;
         const user = await prisma.user.findUnique({where:{id:updateObj.id}});
@@ -117,7 +118,7 @@ const userAddEmail = catchDBAsync( async (updateObj)=>{
         }
         user.email.map(el=>{if(!email.includes(el) && user.primaryEmail!==el){email.push(el)}})
 
-        return prisma.user.update({
+        return await prisma.user.update({
             where: {id: updateObj.id},
             data: {
               email
@@ -127,7 +128,7 @@ const userAddEmail = catchDBAsync( async (updateObj)=>{
     return updatedUser;
 })
 
-const removeUserEmail = catchDBAsync( async (updateObj)=>{
+export const removeUserEmail = catchDBAsync( async (updateObj)=>{
     const updatedUser = await prisma.$transaction( async (prisma)=>{
         const user = await prisma.user.findUnique({where:{id: updateObj.id}});
         const email = updateObj.email;
@@ -143,7 +144,7 @@ const removeUserEmail = catchDBAsync( async (updateObj)=>{
         if(lng === updatedEmail.length){
             throw new AppError('The email does not exist in your email collections',404);
         }
-        return prisma.user.update({
+        return await prisma.user.update({
             where: {id: updateObj.id},
             data: {
               email: updatedEmail,
@@ -154,23 +155,44 @@ const removeUserEmail = catchDBAsync( async (updateObj)=>{
     return updatedUser;
 })
 
-const pwdChange = catchDBAsync (async (user)=>{
+export const pwdChange = catchDBAsync (async (user)=>{
     const updatedUser = await prisma.$transaction( async (prisma)=>{
-        return prisma.user.update({
+        return await prisma.user.update({
             where: {id: user.id},
             data: {
                 password: user.password,
-                passwordChangeAt: user.passwordChangeAt
+                passwordChangeAt: user.passwordChangeAt,
+                passwordChangeToken : null,
+                passwordChangeTokenExpires: null
             }
         })
     })
     return updatedUser;
 })
 
-export {
-    createUser,userUpdateName,userUpdateAbout,getUser,getUserByEmail,
-    removeUserEmail,userAddEmail,userUpdatePhoneNumber,userUpdatePhoto,
-    pwdChange
-    
-}
 
+
+export const forgetPwd = catchDBAsync( async (id)=>{
+    const token = crypto.randomBytes(32).toString('hex');
+    const hashToken = crypto.createHash('sha256').update(token).digest('hex')
+    const expiresIn = new Date((Date.now()+(10*60*1000)))
+    await prisma.user.update({
+        where: {id},
+        data:{
+            passwordChangeToken : hashToken,
+            passwordChangeTokenExpires: expiresIn
+        }
+    })
+    return token;
+})
+
+
+export const getUserByPwdChangeToken = catchDBAsync(async(passwordChangeToken)=>{
+    const user = await prisma.user.findFirst({
+        where : {
+            passwordChangeToken, 
+            passwordChangeTokenExpires : {gt: new Date(Date.now())}
+        }
+    })
+    return user;
+})
