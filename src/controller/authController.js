@@ -8,7 +8,7 @@ import bcrypt from 'bcryptjs'
 import jwt from 'jsonwebtoken'
 import crypto from 'crypto'
 import {sendMail} from '../utils/mail.js'
-
+import {fieldFilter} from '../utils/firldsFilter.js'
 export const signup = catchReqResAsync(async (req,resp, next)=>{
 
     const valid = userValidation.validate(req.body, options);
@@ -27,7 +27,7 @@ export const signup = catchReqResAsync(async (req,resp, next)=>{
     resp.status(201).json({
         satatus: 'success',
         data: {
-            user : newUser
+            user : await fieldFilter(newUser)
         }
     })
 })
@@ -81,9 +81,7 @@ export const protect = catchReqResAsync(async(req,resp,next)=>{
         return next(new AppError('You changed password recently. Please login again.', 401))
       }
     }
-
-    user.password = null;
-    req.user = user
+    req.user = await fieldFilter(user)
     next()
 })
 
@@ -104,11 +102,10 @@ export const getMe = catchReqResAsync(async (req,resp, next)=>{
         return next(new AppError('Somwthing went wrong!',500));
      }
     const user = await getUser(req.user.id);
-    user.password = null
     resp.status(200).json({
         satatus: 'success',
         data: {
-            user
+            user : await fieldFilter(user)
         }
     })
 })
@@ -125,12 +122,11 @@ export const fetchUserByEmail = catchReqResAsync(async (req,resp, next)=>{
     if(!user){
         return next(new AppError(`No user found with this email: ${primaryEmail}`,404))
     }
-    user.password = null
 
     resp.status(200).json({
         satatus: 'success',
         data: {
-            user
+            user : await fieldFilter(user)
         }
     })
 })
@@ -162,12 +158,10 @@ export const changePwd = catchReqResAsync(async (req,resp,next)=>{
 
     user =  await pwdChange(user)
 
-    user.password = null
-
     resp.status(200).json({
         satatus: 'success',
         data: {
-            user
+            user : await fieldFilter(user)
         }
     })
 })

@@ -1,5 +1,20 @@
 import { PrismaClient } from "@prisma/client";
-const prisma = new PrismaClient();
+const prisma = new PrismaClient({
+    omit: {
+        user:{
+           password: true,
+           passwordChangeAt: true,
+           createdAt: true,
+           updatedAt: true,
+           passwordChangeToken: true,
+           passwordChangeTokenExpires: true,
+           role: true
+
+        }
+    }
+});
+
+
 import {catchDBAsync} from '../utils/catchAsyn.js'
 
 export const postJob = catchDBAsync( async(job)=>{
@@ -28,16 +43,14 @@ export const jobSearch = catchDBAsync(async(val)=>{
         {where: {
             jobTitle:{
                 contains: val,
-                mode: 'insensitive'
-            }
+                mode: 'insensitive', 
+            },
         },
+        
         include: {user: true},
     })
    return rs;
 })
-
-
-
 
 export const findPostedJobs = catchDBAsync(async(id)=>{
     const rs = await prisma.jobs.findMany(

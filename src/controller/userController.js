@@ -4,8 +4,7 @@ import { AppError } from "../utils/appError.js";
 import {catchReqResAsync} from '../utils/catchAsyn.js'
 import {options,userEmailValidation,
     userNameValidation,userPhoneNumberValidation,} from '../validation/userValidation.js'
-
-
+import {fieldFilter} from '../utils/firldsFilter.js'
 
 export const addUserEmail = catchReqResAsync(async(req,resp,next)=>{
     const valid = userEmailValidation.validate(req.body, options);
@@ -17,10 +16,11 @@ export const addUserEmail = catchReqResAsync(async(req,resp,next)=>{
     }
     const updateObj = {email: req.body.email, id: req.user.id}
     const updatedUser = await userAddEmail(updateObj);
+
     resp.status(201).json({
         status: 'success',
         data:{
-            user: updatedUser
+            user: await fieldFilter(updatedUser)
         }
     })
     
@@ -36,7 +36,7 @@ export const userEmailRemoval = catchReqResAsync(async(req,resp,next)=>{
     resp.status(200).json({
         status: 'success',
         data:{
-            user: updatedUser
+            user: await fieldFilter(updatedUser)
         }
     })
 })
@@ -47,7 +47,7 @@ export const updateAbout = catchReqResAsync (async(req,resp,next)=>{
     resp.status(200).json({
         status: 'success',
         data:{
-            user: updatedUser
+            user: await fieldFilter(updatedUser)
         }
     })
 })
@@ -69,7 +69,7 @@ export const nameUpdate = catchReqResAsync( async(req,resp,next)=>{
     resp.status(200).json({
         status: 'success',
         data:{
-            user: updatedUser
+            user: await fieldFilter(updatedUser)
         }
     })
 })
@@ -88,7 +88,7 @@ export const updatePhoneNumber = catchReqResAsync(async(req,resp,next)=>{
    resp.status(200).json({
     status: 'success',
     data:{
-        user: updatedUser
+        user: await fieldFilter(updatedUser)
     }})
 })
 
@@ -101,7 +101,7 @@ export const updatePhoto = catchReqResAsync (async(req,resp,next)=>{
     resp.status(200).json({
         status: 'success',
         data:{
-            user: updatedUser
+            user: await fieldFilter(updatedUser)
         }
     })
 })
@@ -121,7 +121,7 @@ export const uploadCv = catchReqResAsync(async(req,resp,next)=>{
     resp.status(200).json({
         status: 'success',
         data:{
-            user: updatedUser
+            user: await fieldFilter(updatedUser)
         }
     })
 
@@ -137,7 +137,7 @@ export const removeCv = catchReqResAsync(async(req,resp,next)=>{
     resp.status(200).json({
         status: 'success',
         data:{
-            user: updatedUser
+            user: await fieldFilter(updatedUser)
         }
     })
 

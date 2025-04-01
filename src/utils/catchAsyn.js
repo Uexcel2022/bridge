@@ -2,7 +2,7 @@
 import { AppError } from "./appError.js";
 
 function catchReqResAsync(fn){
-    return(req,res,next)=>{
+    return (req,res,next)=>{
         fn(req,res,next).catch(next);
     }
 }
@@ -11,6 +11,7 @@ const catchDBAsync = fn => {
       return async (value)=>{
     try{
         return await fn(value);
+        
       }catch(err){
         if(err.name==='PrismaClientValidationError'){
             const msg = err.message.split(/Argument|argument/)[1]
