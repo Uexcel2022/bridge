@@ -6,8 +6,7 @@ const jobRouter = express.Router();
 jobRouter.route('/').get(searchJob)
 .post(protect,restrictTo('employer'),createJob);
 
-jobRouter.route('/posted')
-.get(protect,restrictTo('employer'),getPostedJobs)
+jobRouter.route('/posted').get(protect,getPostedJobs)
 
 
 export {jobRouter}

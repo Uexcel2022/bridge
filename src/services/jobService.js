@@ -2,7 +2,7 @@ import { PrismaClient } from "@prisma/client";
 const prisma = new PrismaClient();
 import {catchDBAsync} from '../utils/catchAsyn.js'
 
-const postJob = catchDBAsync( async(job)=>{
+export const postJob = catchDBAsync( async(job)=>{
     const newJob = await  prisma.jobs.create({
         data:{
             company: job.company,
@@ -23,7 +23,7 @@ const postJob = catchDBAsync( async(job)=>{
     return newJob;
 })
 
-const jobSearch = catchDBAsync(async(val)=>{
+export const jobSearch = catchDBAsync(async(val)=>{
     const rs = await prisma.jobs.findMany(
         {where: {
             jobTitle:{
@@ -39,7 +39,7 @@ const jobSearch = catchDBAsync(async(val)=>{
 
 
 
-const findPostedJobs = catchDBAsync(async(id)=>{
+export const findPostedJobs = catchDBAsync(async(id)=>{
     const rs = await prisma.jobs.findMany(
         { where: {
             userId : id
@@ -49,7 +49,7 @@ const findPostedJobs = catchDBAsync(async(id)=>{
 })
 
 
-const findAllPostedJobs = catchDBAsync(async(id)=>{
+export const findAllPostedJobs = catchDBAsync(async(id)=>{
     const rs = await prisma.jobs.findMany(
         { where: {
             userId : id
@@ -58,5 +58,3 @@ const findAllPostedJobs = catchDBAsync(async(id)=>{
    return rs;
 })
 
-
-export {postJob,jobSearch,findPostedJobs,findAllPostedJobs}

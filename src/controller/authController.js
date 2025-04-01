@@ -1,5 +1,6 @@
 import {AppError} from '../utils/appError.js'
-import { createUser,getUser, getUserByEmail,pwdChange,forgetPwd,getUserByPwdChangeToken} from "../services/userService.js";
+import { createUser,getUser, getUserByEmail,pwdChange,forgetPwd,
+    getUserByPwdChangeToken} from "../services/userService.js";
 import {userValidation,options} from '../validation/userValidation.js'
 import {catchReqResAsync} from '.././utils/catchAsyn.js'
 import {promisify} from 'util'
@@ -136,7 +137,6 @@ export const fetchUserByEmail = catchReqResAsync(async (req,resp, next)=>{
 
 export const changePwd = catchReqResAsync(async (req,resp,next)=>{
      
-
     if(!req.user.id){
         return next(new AppError('Somwthing went wrong!',500));
      }
@@ -159,7 +159,6 @@ export const changePwd = catchReqResAsync(async (req,resp,next)=>{
     const hashedPwd  = await bcrypt.hash(newPassword,12)
 
     user.password = hashedPwd
-    user.passwordChangeAt = new Date(Date.now())
 
     user =  await pwdChange(user)
 
@@ -231,7 +230,6 @@ export const resetPassword = catchReqResAsync(async (req,resp,next)=>{
     const hashedPwd  = await bcrypt.hash(newPassword,12)
 
     user.password = hashedPwd
-    user.passwordChangeAt = new Date(Date.now())
 
     await pwdChange(user)
 
@@ -241,7 +239,6 @@ export const resetPassword = catchReqResAsync(async (req,resp,next)=>{
     })
 })
 
-// $2b$12$xYBQ36TgjR98Gf/.auQdGOJS/KLZrIg/G/uhgqQdp6uFG5UFFUMrK
 
 
 

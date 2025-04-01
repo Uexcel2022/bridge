@@ -1,7 +1,7 @@
 import {createQualification,updateQualif,deleteQualif} from '../services/qalificationService.js'
 import {catchReqResAsync} from '../utils/catchAsyn.js'
 
-const createQualif = catchReqResAsync(async(req,res,next)=>{
+export const createQualif = catchReqResAsync(async(req,res,next)=>{
     req.body.userId = req.user.id;
     const newQ = await createQualification(req.body)
     res.status(201).json({
@@ -12,7 +12,7 @@ const createQualif = catchReqResAsync(async(req,res,next)=>{
     })
 })
 
-const qualifUpdate = catchReqResAsync(async(req,res,next)=>{
+export const qualifUpdate = catchReqResAsync(async(req,res,next)=>{
     req.body.qfId = req.params.id*1;
     req.body.userId = req.user.id;
     const updatedQal = await updateQualif(req.body)
@@ -24,7 +24,7 @@ const qualifUpdate = catchReqResAsync(async(req,res,next)=>{
     })
 })
 
-const deleteQaulif = catchReqResAsync(async(req,res,next)=>{
+export const deleteQaulif = catchReqResAsync(async(req,res,next)=>{
     await deleteQualif(req.params.id*1)
     res.status(204).json({
         success: 'success',
@@ -33,5 +33,3 @@ const deleteQaulif = catchReqResAsync(async(req,res,next)=>{
         }
     })
 })
-
-export {createQualif,qualifUpdate,deleteQaulif}

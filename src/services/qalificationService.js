@@ -4,7 +4,7 @@ import { AppError } from "../utils/appError.js";
 
 const prisma = new PrismaClient();
 
-const createQualification = catchDBAsync (async(qualifs) =>{
+export const createQualification = catchDBAsync (async(qualifs) =>{
     const newQual = await prisma.qualifications.create({ 
         data:{
             school: qualifs.school,
@@ -21,7 +21,7 @@ const createQualification = catchDBAsync (async(qualifs) =>{
     return newQual;
 })
 
-const updateQualif = catchDBAsync(async (userQualf)=>{
+export const updateQualif = catchDBAsync(async (userQualf)=>{
         const userupdatedQual = await prisma.$transaction(async(prisma)=>{
             const qualif = await prisma.qualifications.findUnique({where: {id:userQualf.qfId}})
             if(!qualif){
@@ -43,8 +43,7 @@ const updateQualif = catchDBAsync(async (userQualf)=>{
         return userupdatedQual
 })
 
-const deleteQualif = catchDBAsync(async (qalfId)=>{
+export const deleteQualif = catchDBAsync(async (qalfId)=>{
     await prisma.qualifications.delete({where: {id: qalfId}})
 })
 
-export {createQualification,updateQualif,deleteQualif}

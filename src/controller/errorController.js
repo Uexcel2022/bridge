@@ -3,7 +3,6 @@ import { AppError } from "../utils/appError.js";
 const globalErrorHandler = async(err,req,res,next)=>{
     err.statusCode = err.statusCode || 500
     err.status = err.status||'error'
-    console.log(err.name);
 
     if(err.name ==='JsonWebTokenError'){
         err = new AppError('Invalid token. Please login again',401)
