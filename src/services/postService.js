@@ -1,4 +1,5 @@
 import {PrismaClient} from '@prisma/client'
+import { timeZone } from '../utils/timeZone.js';
 const prisma = new PrismaClient();
 
 export const newPost = async (post)=>{
@@ -6,7 +7,7 @@ export const newPost = async (post)=>{
         const newpst = await prisma.posts.create({
             data : {
                 text : post.text,
-                createdAt : new Date(Date.now()),
+                createdAt : await timeZone(),
                 user : {
                     connect : {
                         id : post.userId

@@ -1,11 +1,11 @@
 import {addUserEmail,userEmailRemoval,updateAbout,
     nameUpdate,updatePhoneNumber,updatePhoto,removeCv,uploadCv} from '../controller/userController.js'
 import express from 'express';
-import {protect,restrictTo} from '../controller/authController.js'
+import {protectUser,restrictUserTo} from '../controller/userAuthController.js'
 
 const userRouter = express();
 
-userRouter.use(protect,restrictTo('user','employer'))
+userRouter.use(protectUser,restrictUserTo('user','employer'))
 
 userRouter.patch('/email',addUserEmail);
 userRouter.patch('/email/:index',userEmailRemoval);

@@ -2,18 +2,21 @@ import {addCv, deleteCv, removeUserEmail,userAddEmail,
     userUpdateAbout,userUpdateName,userUpdatePhoneNumber,userUpdatePhoto} from "../services/userService.js";
 import { AppError } from "../utils/appError.js";
 import {catchReqResAsync} from '../utils/catchAsyn.js'
-import {options,userEmailValidation,
-    userNameValidation,userPhoneNumberValidation,} from '../validation/userValidation.js'
+import {options,emailValidation,
+    userNameValidation,PhoneValidation,} from '../validation/userValidation.js'
 import {fieldFilter} from '../utils/firldsFilter.js'
 
 export const addUserEmail = catchReqResAsync(async(req,resp,next)=>{
-    const valid = userEmailValidation.validate(req.body, options);
+    
+    const valid = emailValidation.validate(req.body, options);
 
     if(valid.error){
-       const a = Object.values(valid.error.details)
-       .map(el=>el.message.replace('"','').replace('"','')).join(', ')
+       const a = Object.values(valid.error.details).map(el => `${el.message}`
+        .match(/comfirmPassword/) ? el.message.replace(el.message,"Passwords are not the same."):
+            el.message.replace('"','').replace('"','')).join(', ')
        return next(new AppError(a ,400))
     }
+
     const updateObj = {email: req.body.email, id: req.user.id}
     const updatedUser = await userAddEmail(updateObj);
 
@@ -23,7 +26,6 @@ export const addUserEmail = catchReqResAsync(async(req,resp,next)=>{
             user: await fieldFilter(updatedUser)
         }
     })
-    
 })
 
 export const userEmailRemoval = catchReqResAsync(async(req,resp,next)=>{
@@ -41,6 +43,7 @@ export const userEmailRemoval = catchReqResAsync(async(req,resp,next)=>{
     })
 })
 
+
 export const updateAbout = catchReqResAsync (async(req,resp,next)=>{
     req.body.id = req.user.id
     const updatedUser = await userUpdateAbout(req.body)
@@ -54,7 +57,6 @@ export const updateAbout = catchReqResAsync (async(req,resp,next)=>{
 
 
 export const nameUpdate = catchReqResAsync( async(req,resp,next)=>{
-    
 
     const valid = userNameValidation.validate(req.body, options);
 
@@ -76,7 +78,7 @@ export const nameUpdate = catchReqResAsync( async(req,resp,next)=>{
 
 export const updatePhoneNumber = catchReqResAsync(async(req,resp,next)=>{
    
-   const valid = userPhoneNumberValidation.validate(req.body, options);
+   const valid = PhoneValidation.validate(req.body, options);
 
     if(valid.error){
        const a = Object.values(valid.error.details)
@@ -116,7 +118,7 @@ export const uploadCv = catchReqResAsync(async(req,resp,next)=>{
         return next(new AppError('Please provide pdf document',400))
     }
 
-    req.body.id =req.user.id;
+    req.body.id = req.user.id;
     const updatedUser = await addCv(req.body);
     resp.status(200).json({
         status: 'success',
@@ -124,7 +126,6 @@ export const uploadCv = catchReqResAsync(async(req,resp,next)=>{
             user: await fieldFilter(updatedUser)
         }
     })
-
 })
 
 

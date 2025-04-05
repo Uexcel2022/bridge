@@ -1,4 +1,5 @@
 import { AppError } from "../utils/appError.js";
+import { Prisma } from "@prisma/client";
 
 const globalErrorHandler = async(err,req,res,next)=>{
     err.statusCode = err.statusCode || 500
@@ -10,6 +11,13 @@ const globalErrorHandler = async(err,req,res,next)=>{
 
     if(err.name ==='TokenExpiredError'){
         err = new AppError('The Token has expired. Please login again',401)
+    }
+
+    if (err instanceof Prisma.PrismaClientKnownRequestError) {
+        // Handle known Prisma errors
+        if (err.code === 'P1001') {
+            err = new AppError('Database connection error. Please try again later.', 500)
+        }
     }
 
     if(process.env.NODE_ENV==='development'){

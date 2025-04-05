@@ -39,7 +39,7 @@ export const userValidation = Joi.object().keys({
     .min(8).message('Password must be up to 8 characters long')
     .max(16).message('Password must not be more than 16 characters long'),
 
-    confirmPassword: Joi.ref('password')
+    comfirmPassword: Joi.ref('password')
 
 });
 
@@ -74,17 +74,33 @@ export const userNameValidation = Joi.object().keys({
 
 
 
-export const userPhoneNumberValidation = Joi.object().keys({
+export const PhoneValidation = Joi.object().keys({
     phoneNumber: Joi.string().trim().required()
     .regex(/^0[7-9][10][0-9]{8}$/)
     .message('Please provide a valid phone number!')
 })
 
 
-export const userEmailValidation = Joi.object().keys({
+export const emailValidation = Joi.object().keys({
     email: Joi.string().required()
     .lowercase().trim().email()
     .message('Please provide a valid email!'),
+})
+
+export const companyValidation = Joi.object().keys({
+    email: Joi.string().required()
+    .lowercase().trim().email()
+    .message('Please provide a valid email!'),
+
+    phone: Joi.string().trim().required()
+    .regex(/^0[7-9][10][0-9]{8}$/)
+    .message('Please provide a valid phone number!'),
+
+    password: Joi.string().trim().required()
+    .min(8).message('Password must be up to 8 characters long')
+    .max(16).message('Password must not be more than 16 characters long'),
+
+    comfirmPassword: Joi.ref('password')
 })
 
 export const options ={

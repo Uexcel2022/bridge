@@ -1,13 +1,19 @@
 import {PrismaClient} from '@prisma/client'
-import {catchDBAsync} from '.././utils/catchAsyn.js'
+import {catchDBAsync} from '../utils/catchAsyn.js'
 import { AppError } from '../utils/appError.js';
 import crypto  from 'crypto'
+import { timeZone } from '../utils/timeZone.js';
+
 const prisma = new PrismaClient();
 
 export const createUser = catchDBAsync(async (user)=>{
-    user.role = 'user'
     const newUsr = await prisma.user.create({
-        data : user
+        data : {
+            ...user,
+            role :'user',
+            createdAt: await timeZone(),
+            comfirmPassword : undefined
+        }
     })
     return newUsr;
 })
@@ -52,7 +58,7 @@ export const userUpdateName = catchDBAsync(async (updateObj)=>{
                 firstName: updateObj.firstName,
                 lastName: updateObj.lastName,
                 gender: updateObj.gender,
-                updatedAt: new Date(Date.now())
+                updatedAt: await timeZone()
             }
         })
     })
@@ -70,7 +76,7 @@ export const userUpdateAbout = catchDBAsync (async (updateData)=>{
             where: {id: updateData.id},
             data: {
                 about: updateData.about,
-                updatedAt: new Date(Date.now())
+                updatedAt: await timeZone()
             }
         })
     })
@@ -87,7 +93,7 @@ export const userUpdatePhoneNumber = catchDBAsync(async (updateObj)=>{
             where: {id: updateObj.id},
             data: {
                 phoneNumber: updateObj.phoneNumber,
-                updatedAt: new Date(Date.now())
+                updatedAt: await timeZone()
             }
         })
     })
@@ -105,7 +111,7 @@ export const userUpdatePhoto = catchDBAsync(async (updateObj)=>{
             where: {id: updateObj.id},
             data: {
                 photo: updateObj.photo,
-                updatedAt: new Date(Date.now())
+                updatedAt: await timeZone()
             }
         })
     })
@@ -127,7 +133,7 @@ export const userAddEmail = catchDBAsync( async (updateObj)=>{
             where: {id: updateObj.id},
             data: {
               email,
-              updatedAt: new Date(Date.now())
+              updatedAt: await timeZone()
             }
         })
     })
@@ -155,7 +161,7 @@ export const removeUserEmail = catchDBAsync( async (updateObj)=>{
             where: {id: updateObj.id},
             data: {
               email: user.email,
-              updatedAt: new Date(Date.now())
+              updatedAt: await timeZone()
             }
         })
     })
@@ -171,7 +177,7 @@ export const pwdChange = catchDBAsync (async (user)=>{
                 password: user.password,
                 passwordChangeToken : null,
                 passwordChangeTokenExpires: null,
-                passwordChangeAt: new Date(Date.now())
+                passwordChangeAt: await timeZone()
             }
         })
     })
@@ -194,10 +200,11 @@ export const forgetPwd = catchDBAsync( async (id)=>{
 
 
 export const getUserByPwdChangeToken = catchDBAsync(async(passwordChangeToken)=>{
+    const timestamp = await timeZone();
     const user = await prisma.user.findFirst({
         where : {
             passwordChangeToken, 
-            passwordChangeTokenExpires : {gt: new Date(Date.now())}
+            passwordChangeTokenExpires : {gt: timestamp}
         }
     })
     return user;
@@ -215,7 +222,7 @@ export const addCv = catchDBAsync( async (updateObj)=>{
             where: {id: updateObj.id},
             data: {
               cv,
-              updatedAt: new Date(Date.now())
+              updatedAt: await timeZone(),
             }
         })
     })
@@ -241,7 +248,7 @@ export const deleteCv = catchDBAsync( async (updateObj)=>{
             where: {id: updateObj.id},
             data: {
               cv: user.cv,
-              updatedAt: new Date(Date.now())
+              updatedAt: await timeZone(),
             }
         })
     })

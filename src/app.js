@@ -1,7 +1,8 @@
 import {config} from 'dotenv'
 config();
 import express from 'express';
-import {authRouter} from './routers/authRouter.js'
+
+import {userAuthRouter} from './routers/userAuthRouter.js'
 import {postRouter} from './routers/postRoute.js'
 import { jobRouter } from './routers/jobRouter.js';
 import { jobAppRouter} from './routers/jobAppRouter.js';
@@ -9,16 +10,38 @@ import { userRouter } from './routers/userRouter.js';
 import { globalErrorHandler } from './controller/errorController.js';
 import { qaulifRouter } from './routers/qaulfRouter.js'
 import { AppError } from './utils/appError.js';
+import {companyRouter} from './routers/companyRouter.js'
+import limit from 'express-rate-limit'
+import helmet from 'helmet'
 
 const app = express();
-app.use(express.json());
 
-app.use('/api/v1/auth',authRouter);
+process.on('uncaughtException',(err)=>{
+    console.log('Uncaught Exception! Shutting down...')
+    console.log(err.name,err.message)
+        process.exit(1)
+   })
+
+const limiter = limit({
+    max: 100,
+    windowMs: 60 * 60 * 1000, // 1 hour
+    message: 'Too many requests from this IP, please try again in an hour!'
+});
+
+
+
+app.use(express.json({limit:'100kb'}));
+app.use(helmet());
+app.use('/api',limiter);
+app.set('trust proxy',['52.41.36.82','54.191.253.12','44.226.122.3'])
+
+app.use('/api/v1/users/auth',userAuthRouter);
 app.use('/api/v1/posts',postRouter);
 app.use('/api/v1/jobs',jobRouter);
 app.use('/api/v1/jobs/application',jobAppRouter)
 app.use('/api/v1/users',userRouter)
 app.use('/api/v1/users/qualifications',qaulifRouter);
+app.use('/api/v1/companies',companyRouter);
 
 app.all('/*',(req,resp,next)=>{
     return next(new AppError(

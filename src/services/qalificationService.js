@@ -1,6 +1,7 @@
 import { PrismaClient } from "@prisma/client";
 import {catchDBAsync} from '../utils/catchAsyn.js'
 import { AppError } from "../utils/appError.js";
+import { timeZone } from "../utils/timeZone.js";
 
 const prisma = new PrismaClient();
 
@@ -9,7 +10,7 @@ export const createQualification = catchDBAsync (async(qualifs) =>{
         data:{
             school: qualifs.school,
             qualification: qualifs.qualification,
-            createdAt: new Date(Date.now()),
+            createdAt: await timeZone(),
             user:{
                 connect : {id: qualifs.userId}
             }
@@ -32,7 +33,7 @@ export const updateQualif = catchDBAsync(async (userQualf)=>{
                 data:{
                     school: userQualf.school,
                     qualification: userQualf.qualification,
-                    updatedAt: new Date(Date.now()),
+                    updatedAt: await timeZone(),
                     user:{
                         connect: {id: userQualf.userId}
                     }
