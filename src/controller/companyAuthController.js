@@ -3,6 +3,7 @@ import {signup,getCompany,getCompanyByEmail,forgetPwd,
     getUserByPwdChangeToken,pwdChange} from "../services/companyService.js";
 import {companyValidation,options} from '../validation/userValidation.js'
 import {catchReqResAsync} from '../utils/catchAsyn.js'
+import {isStrongPassword} from '../utils/checkPassword.js'
 import {promisify} from 'util'
 import bcrypt from 'bcryptjs'
 import jwt from 'jsonwebtoken'
@@ -24,6 +25,12 @@ export const companySignup = catchReqResAsync(async(req,resp,next)=>{
 
        return next(new AppError(a ,400))
     }
+
+
+    if(!isStrongPassword(req.body.password)){           
+        return next(new AppError('Password must be at least 8 characters long and contain at least one uppercase letter, one lowercase letter, one number, and one special character.',400))
+    }
+
     req.body.comfirmPassword = undefined;
     req.body.password = await bcrypt.hash(req.body.password,12);
     const newComp = await signup(req.body);
@@ -122,6 +129,11 @@ export const changePwd = catchReqResAsync(async (req,resp,next)=>{
     if(comfirmPassword !== newPassword){
         return next(new AppError('Passwords are not the same.',400))
     }
+
+    if(!isStrongPassword(newPassword)){           
+        return next(new AppError('Password must be at least 8 characters long and contain at least one uppercase letter, one lowercase letter, one number, and one special character.',400))
+    }
+
     let company = await getCompany(req.company.id);
 
     if(!await bcrypt.compare(oldPassword,company.password)){
@@ -184,6 +196,10 @@ export const resetPassword = catchReqResAsync(async (req,resp,next)=>{
 
     if(comfirmPassword !== newPassword){
         return next(new AppError('Passwords are not the same.',400))
+    }
+
+    if(!isStrongPassword(newPassword)){           
+        return next(new AppError('Password must be at least 8 characters long and contain at least one uppercase letter, one lowercase letter, one number, and one special character.',400))
     }
     
     const hashPwdChgToken = crypto.createHash('sha256')

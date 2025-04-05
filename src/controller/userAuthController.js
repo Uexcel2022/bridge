@@ -9,6 +9,7 @@ import jwt from 'jsonwebtoken'
 import crypto from 'crypto'
 import {sendMail} from '../utils/mail.js'
 import {fieldFilter,authFieldFilter} from '../utils/firldsFilter.js'
+import { isStrongPassword } from '../utils/checkPassword.js';
 
 export const signupUser = catchReqResAsync(async (req,resp, next)=>{
 
@@ -22,6 +23,10 @@ export const signupUser = catchReqResAsync(async (req,resp, next)=>{
 
        return next(new AppError(a ,400))
     }
+
+    if(!isStrongPassword(req.body.password)){           
+            return next(new AppError('Password must be at least 8 characters long and contain at least one uppercase letter, one lowercase letter, one number, and one special character.',400))
+        }
 
     req.body.password = await bcrypt.hash(req.body.password,12);
 
@@ -158,6 +163,12 @@ export const changePwd = catchReqResAsync(async (req,resp,next)=>{
     if(comfirmPassword !== newPassword){
         return next(new AppError('Passwords are not the same.',400))
     }
+
+    if(!isStrongPassword(newPassword)){           
+        return next(new AppError('Password must be at least 8 characters long and contain at least one uppercase letter, one lowercase letter, one number, and one special character.',400))
+    }
+
+
     let user = await getUser(req.user.id);
 
     if(!await bcrypt.compare(oldPassword,user.password)){
@@ -220,6 +231,10 @@ export const resetPassword = catchReqResAsync(async (req,resp,next)=>{
 
     if(comfirmPassword !== newPassword){
         return next(new AppError('Passwords are not the same.',400))
+    }
+
+    if(!isStrongPassword(newPassword)){           
+        return next(new AppError('Password must be at least 8 characters long and contain at least one uppercase letter, one lowercase letter, one number, and one special character.',400))
     }
     
     const hashPwdChgToken = crypto.createHash('sha256')
