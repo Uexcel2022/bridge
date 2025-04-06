@@ -45,7 +45,7 @@ export const updateCompany = catchDBAsync(async (updateObj)=>{
   const updatedCompany = await prisma.$transaction( async (prisma)=>{
       const company = await prisma.company.findUnique({where: {id: updateObj.id}});
       if(!company){
-          throw new AppError('Company not found with that ID!')
+          throw new AppError('Company not found with that ID!',404)
       }
       return await prisma.company.update({
           where: {id: updateObj.id},
@@ -67,7 +67,7 @@ export const updatePhone = catchDBAsync(async (updateObj)=>{
     const updatedCompany = await prisma.$transaction( async (prisma)=>{
         const company = await prisma.company.findUnique({where: {id: updateObj.id}});
         if(!company){
-            throw new AppError('Company not found with that ID!')
+            throw new AppError('Company not found with that ID!',404)
         }
         return await prisma.company.update({
             where: {id: updateObj.id},
@@ -86,7 +86,7 @@ export const updateEmail = catchDBAsync(async (updateObj)=>{
     const updatedCompany = await prisma.$transaction( async (prisma)=>{
         const company = await prisma.company.findUnique({where: {id: updateObj.id}});
         if(!company){
-            throw new AppError('Company not found with that ID!')
+            throw new AppError('Company not found with that ID!',404)
         }
         return await prisma.company.update({
             where: {id: updateObj.id},
@@ -103,6 +103,10 @@ export const updateEmail = catchDBAsync(async (updateObj)=>{
 
 export const pwdChange = catchDBAsync (async (company)=>{
     const updatedCompany = await prisma.$transaction( async (prisma)=>{
+        const company = await prisma.company.findUnique({where: {id: company.id}});
+        if(!company){
+            throw new AppError('Company not found with that ID!',404)
+        }
         return await prisma.company.update({
             where: {id: company.id},
             data: {
@@ -140,4 +144,14 @@ export const getUserByPwdChangeToken = catchDBAsync(async(passwordChangeToken)=>
         }
     })
     return user;
+})
+
+
+export const deleteCompany = catchDBAsync(async (id)=>{
+    const company = await prisma.company.findUnique({where: {id}});
+
+    if(!company){
+        throw new AppError('Company not found with that ID!',404)
+    }
+     await prisma.company.delete({where: {id}})
 })

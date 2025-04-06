@@ -1,4 +1,5 @@
-import {getCompany,getCompanyByEmail,updateCompany,updatePhone,updateEmail} from '../services/companyService.js'
+import {getCompany,getCompanyByEmail,updateCompany,
+    updatePhone,updateEmail,deleteCompany} from '../services/companyService.js'
 import { AppError } from '../utils/appError.js'
 import {catchReqResAsync} from '../utils/catchAsyn.js'
 import {emailValidation,PhoneValidation,options} from '../validation/userValidation.js'
@@ -99,3 +100,17 @@ export const phoneUpdate = catchReqResAsync(async(req,resp,next)=>{
     })
 
 })
+
+export const deleteComp = catchReqResAsync(async(req,resp,next)=>{
+    if(!req.company.id){
+        return next(new AppError('Somwthing went wrong!',500));
+     }
+    await deleteCompany(req.company.id)
+    resp.status(204).json({
+        satatus: 'success',
+        data: {
+            company : null
+        }
+    })
+
+})  

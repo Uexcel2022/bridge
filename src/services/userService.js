@@ -256,3 +256,12 @@ export const deleteCv = catchDBAsync( async (updateObj)=>{
     return updatedUser;
 })
 
+export const deleteUser = catchDBAsync(async (userId)=>{
+    const deletedUser = await prisma.user.delete({
+        where: {id: userId}
+    })
+
+    if(!deletedUser){
+        throw new AppError('User not found with that ID!',404)
+    }
+})

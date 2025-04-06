@@ -78,7 +78,7 @@ model Job{
   location String
   salary String
   active Boolean @default(true)
-  company Company @relation(fields: [companyId], references: [id])
+  company Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
   companyId String
   applicant ApplyForJob []
   createdAt DateTime 

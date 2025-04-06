@@ -1,5 +1,5 @@
-import {addCv, deleteCv, removeUserEmail,userAddEmail,
-    userUpdateAbout,userUpdateName,userUpdatePhoneNumber,userUpdatePhoto} from "../services/userService.js";
+import {addCv, deleteCv, removeUserEmail,userAddEmail,userUpdateAbout,userUpdateName,
+    userUpdatePhoneNumber,userUpdatePhoto,deleteUser} from "../services/userService.js";
 import { AppError } from "../utils/appError.js";
 import {catchReqResAsync} from '../utils/catchAsyn.js'
 import {options,emailValidation,
@@ -142,4 +142,16 @@ export const removeCv = catchReqResAsync(async(req,resp,next)=>{
         }
     })
 
+})
+
+
+export const deleteOneUser = catchReqResAsync(async (req,resp,next)=>{
+    if(!req.user.id){
+        return next(new AppError('Somwthing went wrong!',500));
+     }
+    await deleteUser(req.user.id);
+    resp.status(204).json({
+        status: 'success',
+        data: null
+    })
 })

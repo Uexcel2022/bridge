@@ -13,8 +13,15 @@ import { AppError } from './utils/appError.js';
 import {companyRouter} from './routers/companyRouter.js'
 import limit from 'express-rate-limit'
 import helmet from 'helmet'
+import cors from 'cors'
 
 const app = express();
+
+app.use(cors({
+    origin: "*"
+}))
+
+app.options('*',cors())
 
 process.on('uncaughtException',(err)=>{
     console.log('Uncaught Exception! Shutting down...')
