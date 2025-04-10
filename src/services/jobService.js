@@ -2,7 +2,7 @@ import { PrismaClient } from "@prisma/client";
 import {timeZone} from '../utils/timeZone.js'
 const prisma = new PrismaClient({
     omit: {
-        company:{
+        recruiter:{
            password: true,
            passwordChangeAt: true,
            createdAt: true,
@@ -28,12 +28,12 @@ export const postJob = catchDBAsync( async(job)=>{
             location: job.location,
             salary: job.salary,
             createdAt: await timeZone(),
-            company: {
-                connect: {id: job.companyId},
+            recruiter: {
+                connect: {id: job.recruiterId},
             }
         },
         include:{
-            company: true
+            recruiter: true
         }
     })
     return newJob;
@@ -41,7 +41,7 @@ export const postJob = catchDBAsync( async(job)=>{
 
 export const jobSearch = catchDBAsync(async(queryData)=>{
     const rs = await prisma.job.findMany({
-        skip: (queryData.page-1)*queryData.limit|| 0,
+        skip: (queryData.page-1)*queryData.limit|| 0, 
         take: queryData.limit || 50,
             where: {
             title:{
@@ -52,7 +52,7 @@ export const jobSearch = catchDBAsync(async(queryData)=>{
         },
         orderBy: {createdAt : 'desc'},
         
-        include: {company: true},
+        include: {recruiter: true},
     })
 
     if(rs.length === 0){
@@ -67,7 +67,7 @@ export const findPostedJobs = catchDBAsync(async(queryData)=>{
         skip: (queryData.page-1)*queryData.limit|| 0,
         take: queryData.limit || 50,
         where: {
-            companyId : queryData.id,
+            recruiterId : queryData.id,
             active : true
         },
         orderBy: {createdAt : 'desc'},
@@ -101,7 +101,7 @@ export const updateJob = catchDBAsync( async(jobObj)=>{
             where: {
                 id: jobObj.id,
                 active: true,
-                companyId: jobObj.companyId
+                recruiterId: jobObj.recruiterId
             }
         });
 
@@ -109,7 +109,7 @@ export const updateJob = catchDBAsync( async(jobObj)=>{
             throw new AppError('Job not found!',404)
         }
         return await prisma.job.update({
-            where: {id: jobObj.id, companyId: jobObj.companyId, active: true},
+            where: {id: jobObj.id, recruiterId: jobObj.recruiterId, active: true},
             data: {
                 ...jobObj.body,
                 updatedAt: await timeZone()
@@ -124,7 +124,7 @@ export const clasedAndOpenJob = catchDBAsync( async(jobObj)=>{
         const job = await prisma.job.findUnique({
             where: {
                 id: jobObj.id,
-                companyId: jobObj.companyId
+                recruiterId: jobObj.recruiterId
             }
         });
 
@@ -132,7 +132,7 @@ export const clasedAndOpenJob = catchDBAsync( async(jobObj)=>{
             throw new AppError('Job not found!')
         }
         return await prisma.job.update({
-            where: {id: jobObj.id, companyId: jobObj.companyId},
+            where: {id: jobObj.id, recruiterId: jobObj.recruiterId},
             data: {
                 active: job.active? false : true,
                 updatedAt: await timeZone()
@@ -145,7 +145,7 @@ export const clasedAndOpenJob = catchDBAsync( async(jobObj)=>{
 export const findCloseJobs = catchDBAsync(async(id)=>{
     const rs = await prisma.job.findMany(
         { where: {
-            companyId : id,
+            recruiterId : id,
             active : false
         },orderBy: {createdAt: 'desc'}
     })

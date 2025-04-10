@@ -1,5 +1,5 @@
-import {getCompany,getCompanyByEmail,updateCompany,
-    updatePhone,updateEmail,deleteCompany} from '../services/companyService.js'
+import {getRecruiter,getRecruiterByEmail,deleteRecruiter,
+    updatePhone,updateEmail} from '../services/recruiterService.js'
 import { AppError } from '../utils/appError.js'
 import {catchReqResAsync} from '../utils/catchAsyn.js'
 import {emailValidation,PhoneValidation,options} from '../validation/userValidation.js'
@@ -10,7 +10,7 @@ export const getMe = catchReqResAsync(async (req,resp, next)=>{
     if(!req.company.id){
         return next(new AppError('Somwthing went wrong!',500));
      }
-    const company = await getCompany(req.company.id);
+    const company = await getRecruiter(req.company.id);
     resp.status(200).json({
         satatus: 'success',
         data: {
@@ -24,7 +24,7 @@ export const fetchCompanyByEmail = catchReqResAsync(async (req,resp, next)=>{
      if(!req.body.email){
         return next(new AppError('Please provide email address!',400));
      }
-    const company = await getCompanyByEmail(req.body.email);
+    const company = await getRecruiterByEmail(req.body.email);
 
     if(!company){
         return next(new AppError(`No company found with this email: ${req.body.email}`,404))
@@ -105,7 +105,7 @@ export const deleteComp = catchReqResAsync(async(req,resp,next)=>{
     if(!req.company.id){
         return next(new AppError('Somwthing went wrong!',500));
      }
-    await deleteCompany(req.company.id)
+    await deleteRecruiter(req.company.id)
     resp.status(204).json({
         satatus: 'success',
         data: {

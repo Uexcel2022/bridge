@@ -4,9 +4,9 @@ import {catchReqResAsync} from '../utils/catchAsyn.js'
 import {fieldFilter} from '../utils/firldsFilter.js'
 
 export const createJob = catchReqResAsync(async(req,resp,next)=>{
-    req.body.companyId = req.company.id;
+    req.body.recruiter = req.recruiter.id;
     const newJob = await postJob(req.body);
-    newJob.company = await fieldFilter(newJob.company)
+    newJob.recruiter = await fieldFilter(newJob.recruiter)
     resp.status(201).json({
         status: 'success',
         data:{
@@ -32,7 +32,7 @@ export const searchJob = catchReqResAsync(async(req,resp,next)=>{
 
 export const getPostedJobs = catchReqResAsync(async(req,resp,next)=>{
     const queryData = {page: req.query.page*1, limit: req.query.limit*1};
-    queryData.id =  req.company.id;
+    queryData.id =  req.recruiter.id;
     const results = await findPostedJobs(queryData);
     resp.status(200).json({
         results: results.length,
@@ -58,7 +58,7 @@ export const getAllJobs = catchReqResAsync(async(req,resp,next)=>{
 })
 
 export const closeOrOpendJob = catchReqResAsync(async(req,resp,next)=>{
-    const updateData = {id: req.params.id, companyId: req.company.id}
+    const updateData = {id: req.params.id, recruiterid: req.recruiter.id}
     await clasedAndOpenJob(updateData);
     resp.status(200).json({
         status: 'success',
@@ -91,7 +91,7 @@ export const getJob = catchReqResAsync(async(req,resp,next)=>{
 })
 
 export const jobUpdate = catchReqResAsync(async(req,resp,next)=>{
-    const updateData = {id: req.params.id, companyId: req.company.id, body: req.body}
+    const updateData = {id: req.params.id, recruiterid: req.recruiter.id, body: req.body}
     const res = await updateJob(updateData);
     resp.status(200).json({
         status: 'success',

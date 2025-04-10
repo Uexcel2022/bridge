@@ -1,7 +1,7 @@
 import {AppError} from '../utils/appError.js'
-import {signup,getCompany,getCompanyByEmail,forgetPwd,
-    getUserByPwdChangeToken,pwdChange} from "../services/companyService.js";
-import {companyValidation,options} from '../validation/userValidation.js'
+import {forgetPwd,getRecruiter,getUserByPwdChangeToken,
+    pwdChange,signup,getRecruiterByEmail} from "../services/recruiterService.js";
+import {recruiterValidation,options} from '../validation/userValidation.js'
 import {catchReqResAsync} from '../utils/catchAsyn.js'
 import {isStrongPassword} from '../utils/checkPassword.js'
 import {promisify} from 'util'
@@ -11,12 +11,12 @@ import crypto from 'crypto'
 import {sendMail} from '../utils/mail.js'
 import {fieldFilter,authFieldFilter} from '../utils/firldsFilter.js'
 
-export const companySignup = catchReqResAsync(async(req,resp,next)=>{
+export const recruiterSignup = catchReqResAsync(async(req,resp,next)=>{
 
     const isValid = {email: req.body.email, phone: req.body.phone,
         password: req.body.password, comfirmPassword: req.body.comfirmPassword}
 
-    const valid = companyValidation.validate(isValid, options);
+    const valid = recruiterValidation.validate(isValid, options);
 
     if(valid.error){
        const a = Object.values(valid.error.details).map(el => `${el.message}`
@@ -34,39 +34,44 @@ export const companySignup = catchReqResAsync(async(req,resp,next)=>{
     req.body.comfirmPassword = undefined;
     req.body.password = await bcrypt.hash(req.body.password,12);
     const newComp = await signup(req.body);
+    
+    if(!newComp){
+        next(new AppError('Could not register recruiter.',417))
+    }
+
     resp.status(201).json({
         status: 'success',
         data: {
-            company: await fieldFilter(newComp)
+            recruiter: await fieldFilter(newComp)
         }
     })
 })
 
-export const companyLogin = catchReqResAsync( async(req,resp,next)=>{
+export const recruiterLogin = catchReqResAsync( async(req,resp,next)=>{
     const {email, password} = req.body
     if(!email || !password){
         return next(new AppError('Please provide email and password to login!',400));
     }
-    const company =  await getCompanyByEmail(email) 
+    const recruiter =  await getRecruiterByEmail(email) 
     
-    if(!company ||!await bcrypt.compare(password,company.password)){
+    if(!recruiter ||!await bcrypt.compare(password,recruiter.password)){
         return next(new AppError('Incorrect email or password!',400));
     }
     
-    const token = await promisify(jwt.sign)({id: company.id,role: company.role}, process.env.JWT_SECRET,{
+    const token = await promisify(jwt.sign)({id: recruiter.id,role: recruiter.role}, process.env.JWT_SECRET,{
         expiresIn: process.env.JWT_EXPIRES_IN
     })
     resp.status(200).json({
         satatus: 'success',
         token,
         data: {
-            name: company.name,
-            description: company.description
+            name: recruiter.name,
+            description: recruiter.description
         }
     })
 });
 
-export const protectCompany = catchReqResAsync(async(req,resp,next)=>{
+export const protectRecruiter = catchReqResAsync(async(req,resp,next)=>{
     let token;
     if(req.headers.authorization && req.headers.authorization.startsWith('Bearer ')){
         token = req.headers.authorization.split(' ')[1]
@@ -79,33 +84,34 @@ export const protectCompany = catchReqResAsync(async(req,resp,next)=>{
     
     const docodedToken = await promisify(jwt.verify)(token,process.env.JWT_SECRET)
     
-    if(docodedToken.role !== 'company'){
-        console.log(`companyProtect: You do not have permission to perform this operation. ID: ${docodedToken.id}`)
+    if(docodedToken.role !== 'recruiter'){
+        console.log(`recruiterProtect: You do not have permission to perform this operation. ID: ${docodedToken.id}`)
         return next(new AppError('You do not have permission to perform this operation.',403))    
     }             
     
-    const company = await getCompany(docodedToken.id);
+    const recruiter = await getRecruiter(docodedToken.id);
 
-    if(!company){
-        return next(new AppError('The company associated with the token does not exist', 401))
+    if(!recruiter){
+        return next(new AppError('The recruiter associated with the token does not exist', 401))
     }
     
     const jwtIssuedTime = docodedToken.iat + new Date().getTimezoneOffset()*-1*60;
      
-    if(company.passwordChangeAt !== null){
-        const pwdChgTime = parseInt(company.passwordChangeAt.getTime()/1000,10)
+    if(recruiter.passwordChangeAt !== null){
+        const pwdChgTime = parseInt(recruiter.passwordChangeAt.getTime()/1000,10)
       if(jwtIssuedTime < pwdChgTime){
         return next(new AppError('You changed password recently. Please login again.', 401))
       }
     }
-    req.company = await authFieldFilter(company)
+    req.recruiter = await authFieldFilter(recruiter)
     next()
 })
 
 
-export const restrictCompanyTo = (...roles)=>{
+export const restrictRecruiterTo = (...roles)=>{
     return(req,resp,next)=>{
-        if(!roles.includes(req.company.role)){
+        console.log(roles)
+        if(!roles.includes(req.recruiter.role)){
             return next(new AppError(
                 'You do not have permission to perform this action',403)
             )
@@ -116,7 +122,7 @@ export const restrictCompanyTo = (...roles)=>{
 
 export const changePwd = catchReqResAsync(async (req,resp,next)=>{
      
-    if(!req.company.id){
+    if(!req.recruiter.id){
         return next(new AppError('Somwthing went wrong!',500));
      }
     
@@ -134,20 +140,20 @@ export const changePwd = catchReqResAsync(async (req,resp,next)=>{
         return next(new AppError('Password must be at least 8 characters long and contain at least one uppercase letter, one lowercase letter, one number, and one special character.',400))
     }
 
-    let company = await getCompany(req.company.id);
+    let recruiter = await getRecruiter(req.recruiter.id);
 
-    if(!await bcrypt.compare(oldPassword,company.password)){
+    if(!await bcrypt.compare(oldPassword,recruiter.password)){
         return  next(new AppError('Invalid password!',400))
     }
     
-    company.password  = await bcrypt.hash(newPassword,12)
+    recruiter.password  = await bcrypt.hash(newPassword,12)
 
-    company =  await pwdChange(company)
+    recruiter =  await pwdChange(recruiter)
 
     resp.status(200).json({
         satatus: 'success',
         data: {
-            company : await fieldFilter(company)
+            recruiter : await fieldFilter(recruiter)
         }
     })
 })
@@ -156,21 +162,21 @@ export const forgetPassword = catchReqResAsync (async (req,resp,next)=>{
     if(!req.body.email){
         return next(new AppError('Please provide your email.',404))
     }
-    const company = await getCompanyByEmail(req.body.email);
-    const pwdChangeToken = await forgetPwd(company.id);
+    const recruiter = await getRecruiterByEmail(req.body.email);
+    const pwdChangeToken = await forgetPwd(recruiter.id);
 
     const url = `${req.protocol}://${req.get('host')}/api/vi/auth/resetPassword/${pwdChangeToken}`
     const message = `Forgot password? Submit a patch request with new password and comfirm password to ${url} \nIgnore if you did not innitiate password reset. Thank you.`
     try{
         await sendMail({
-            email: company.email,
+            email: recruiter.email,
             subject: "Reset your password",
             message: message
         })
     }catch(err){
-        await pwdChange(company)
+        await pwdChange(recruiter)
         console.log(err)
-        throw new AppError("Could not send reset password mail to the company.",417)
+        throw new AppError("Could not send reset password mail to the recruiter.",417)
     }
 
     resp.status(200).json({
@@ -205,14 +211,14 @@ export const resetPassword = catchReqResAsync(async (req,resp,next)=>{
     const hashPwdChgToken = crypto.createHash('sha256')
     .update(req.params.token).digest('hex')
 
-    let company = await getUserByPwdChangeToken(hashPwdChgToken);
+    let recruiter = await getUserByPwdChangeToken(hashPwdChgToken);
 
-    if(!company){
+    if(!recruiter){
         return next(new AppError('Token is invalid or has expired.',400))
     }
     
-    company.password  = await bcrypt.hash(newPassword,12)
-    await pwdChange(company)
+    recruiter.password  = await bcrypt.hash(newPassword,12)
+    await pwdChange(recruiter)
 
     resp.status(200).json({
         satatus: 'success',

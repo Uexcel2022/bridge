@@ -87,7 +87,7 @@ export const emailValidation = Joi.object().keys({
     .message('Please provide a valid email!'),
 })
 
-export const companyValidation = Joi.object().keys({
+export const recruiterValidation = Joi.object().keys({
     email: Joi.string().required()
     .lowercase().trim().email()
     .message('Please provide a valid email!'),

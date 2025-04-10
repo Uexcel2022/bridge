@@ -10,7 +10,9 @@ import { userRouter } from './routers/userRouter.js';
 import { globalErrorHandler } from './controller/errorController.js';
 import { qaulifRouter } from './routers/qaulfRouter.js'
 import { AppError } from './utils/appError.js';
-import {companyRouter} from './routers/companyRouter.js'
+import {recruiterRouter} from './routers/recruiterRouter.js'
+import {userUploadRouter} from './routers/userUploadRouter.js'
+import {recruiterUploadRouter} from './routers/recruiterUploadRouter.js'
 import limit from 'express-rate-limit'
 import helmet from 'helmet'
 import cors from 'cors'
@@ -48,7 +50,9 @@ app.use('/api/v1/jobs',jobRouter);
 app.use('/api/v1/jobs/application',jobAppRouter)
 app.use('/api/v1/users',userRouter)
 app.use('/api/v1/users/qualifications',qaulifRouter);
-app.use('/api/v1/companies',companyRouter);
+app.use('/api/v1/recruiters',recruiterRouter);
+app.use('/api/v1/recruiters/uploads/img',recruiterUploadRouter);
+app.use('/api/v1/users/uploads/img',userUploadRouter);
 
 app.all('/*',(req,resp,next)=>{
     return next(new AppError(

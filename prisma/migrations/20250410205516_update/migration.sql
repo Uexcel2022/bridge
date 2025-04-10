@@ -1,0 +1,3 @@
+-- AlterTable
+ALTER TABLE "Image" ALTER COLUMN "userId" SET DEFAULT '0',
+ALTER COLUMN "companyId" SET DEFAULT '0';
