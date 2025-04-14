@@ -11,7 +11,7 @@ export const sendMail = async (option) => {
       },
     });
     const emailOptions = {
-      from: "i-tour <support@itour.io>",
+      from: "i-bridge <support@itour.io>",
       to: option.email,
       subject: option.subject,
       text: option.message,

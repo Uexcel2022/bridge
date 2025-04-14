@@ -8,7 +8,7 @@ import bcrypt from 'bcryptjs'
 import jwt from 'jsonwebtoken'
 import crypto from 'crypto'
 import {sendMail} from '../utils/mail.js'
-import {fieldFilter,authFieldFilter} from '../utils/firldsFilter.js'
+import {fieldFilter} from '../utils/fieldsFilter.js'
 import { isStrongPassword } from '../utils/checkPassword.js';
 
 export const signupUser = catchReqResAsync(async (req,resp, next)=>{
@@ -65,55 +65,6 @@ export const loginUser = catchReqResAsync( async(req,resp,next)=>{
     })
 });
 
-export const protectUser = catchReqResAsync(async(req,resp,next)=>{
-    let token;
-    if(req.headers.authorization && req.headers.authorization.startsWith('Bearer ')){
-        token = req.headers.authorization.split(' ')[1]
-    }
-    
-    if(!token){
-        return next(
-            new AppError('You are not logged in. Please login to continue!',401))
-    }
-
-    const docodedToken = await promisify(jwt.verify)(token,process.env.JWT_SECRET)
-
-    if(docodedToken.role !== 'user'){
-        console.log(`protectUser: You do not have permission to perform this operation. ID: ${docodedToken.id}`)
-        return next(new AppError('You do not have permission to perform this operation.',403))
-    }
-
-    const user=  await getUser(docodedToken.id);
-
-    if(!user){
-        return new AppError('The user associated with the token does not exist', 401)
-    }
-
-    const jwtIssuedTime = docodedToken.iat + new Date().getTimezoneOffset()*-1*60;
-    if(user.passwordChangeAt !== null){
-        const pwdChgTime = parseInt(user.passwordChangeAt.getTime()/1000,10)
-      if(jwtIssuedTime < pwdChgTime){
-        return next(new AppError('You changed password recently. Please login again.', 401))
-      }
-    }
-
-    req.user = await authFieldFilter(user)
-    next()
-})
-
-export const restrictUserTo = (...roles)=>{
-    
-    return(req,resp,next)=>{
-        if(!roles.includes(req.user.role)){
-            return next(new AppError(
-                'You do not have permission to perform this action',403)
-            )
-        }
-        next();
-    }
-}
-
-
 export const getMe = catchReqResAsync(async (req,resp, next)=>{
     if(!req.user.id){
         return next(new AppError('Somwthing went wrong!',500));
@@ -167,7 +118,6 @@ export const changePwd = catchReqResAsync(async (req,resp,next)=>{
     if(!isStrongPassword(newPassword)){           
         return next(new AppError('Password must be at least 8 characters long and contain at least one uppercase letter, one lowercase letter, one number, and one special character.',400))
     }
-
 
     let user = await getUser(req.user.id);
 

@@ -1,51 +1,52 @@
 import {getRecruiter,getRecruiterByEmail,deleteRecruiter,
-    updatePhone,updateEmail} from '../services/recruiterService.js'
+    updatePhone,updateEmail,
+    updateRecruiter} from '../services/recruiterService.js'
 import { AppError } from '../utils/appError.js'
 import {catchReqResAsync} from '../utils/catchAsyn.js'
 import {emailValidation,PhoneValidation,options} from '../validation/userValidation.js'
-import {fieldFilter} from '../utils/firldsFilter.js'
+import {fieldFilter} from '../utils/fieldsFilter.js'
 
 
 export const getMe = catchReqResAsync(async (req,resp, next)=>{
-    if(!req.company.id){
+    if(!req.recruiter.id){
         return next(new AppError('Somwthing went wrong!',500));
      }
-    const company = await getRecruiter(req.company.id);
+    const recruiter = await getRecruiter(req.recruiter.id);
     resp.status(200).json({
         satatus: 'success',
         data: {
-            company : await fieldFilter(company)
+            recruiter : await fieldFilter(recruiter)
         }
     })
 })
 
-export const fetchCompanyByEmail = catchReqResAsync(async (req,resp, next)=>{
+export const fetchRecruiterByEmail = catchReqResAsync(async (req,resp, next)=>{
 
      if(!req.body.email){
         return next(new AppError('Please provide email address!',400));
      }
-    const company = await getRecruiterByEmail(req.body.email);
+    const recruiter = await getRecruiterByEmail(req.body.email);
 
-    if(!company){
-        return next(new AppError(`No company found with this email: ${req.body.email}`,404))
+    if(!recruiter){
+        return next(new AppError(`No recruiter found with this email: ${req.body.email}`,404))
     }
 
     resp.status(200).json({
         satatus: 'success',
         data: {
-            company : await fieldFilter(company)
+            recruiter : await fieldFilter(recruiter)
         }
     })
 })
 
-export const compUpdate = catchReqResAsync(async(req,resp,next)=>{
+export const recruiterUpdate = catchReqResAsync(async(req,resp,next)=>{
 
-    req.body.id = req.company.id;
-    const updateComp = await updateCompany(req.body)
+    req.body.id = req.recruiter.id;
+    const updateRcruiter = await updateRecruiter(req.body)
     resp.status(200).json({
         satatus: 'success',
         data: {
-            company : await fieldFilter(updateComp)
+            recruiter : await fieldFilter(updateRcruiter)
         }
     })
 
@@ -65,12 +66,12 @@ export const emailUpdate = catchReqResAsync(async(req,resp,next)=>{
         return next(new AppError(err ,400))
        }
 
-    req.body.id = req.company.id;
+    req.body.id = req.recruiter.id;
     const updateComp = await updateEmail(req.body)
     resp.status(200).json({
         satatus: 'success',
         data: {
-            company : await fieldFilter(updateComp)
+            recruiter : await fieldFilter(updateComp)
         }
     })
 
@@ -90,26 +91,26 @@ export const phoneUpdate = catchReqResAsync(async(req,resp,next)=>{
         return next(new AppError(err ,400))
        }
 
-    req.body.id = req.company.id;
+    req.body.id = req.recruiter.id;
     const updateComp = await updatePhone(req.body)
     resp.status(200).json({
         satatus: 'success',
         data: {
-            company : await fieldFilter(updateComp)
+            recruiter : await fieldFilter(updateComp)
         }
     })
 
 })
 
-export const deleteComp = catchReqResAsync(async(req,resp,next)=>{
-    if(!req.company.id){
+export const deleRecruiter = catchReqResAsync(async(req,resp,next)=>{
+    if(!req.recruiter.id){
         return next(new AppError('Somwthing went wrong!',500));
      }
-    await deleteRecruiter(req.company.id)
+    await deleteRecruiter(req.recruiter.id)
     resp.status(204).json({
         satatus: 'success',
         data: {
-            company : null
+            recruiter : null
         }
     })
 

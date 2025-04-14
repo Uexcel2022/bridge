@@ -1,14 +1,13 @@
 import express from 'express'
 import {createQualif,qualifUpdate,deleteQaulif} from '../controller/qualificationController.js'
-import{ protectUser } from '../controller/userAuthController.js'
+import{ protect,restrictTo } from '../auth/auth.js'
 
 const qaulifRouter = express.Router();
 
-qaulifRouter.use(protectUser)
+qaulifRouter.use(protect)
 
-qaulifRouter.route('/').post(protectUser,createQualif);
-qaulifRouter.route('/:id').patch(protectUser,qualifUpdate)
-.delete(protectUser,deleteQaulif)
-
+qaulifRouter.route('/').post(protect,restrictTo('user'),createQualif);
+qaulifRouter.route('/:id').patch(protect,restrictTo('user'),qualifUpdate)
+.delete(protect,restrictTo('user'),deleteQaulif)
 
 export {qaulifRouter};

@@ -1,18 +1,19 @@
 import express from 'express';
-import {compUpdate,fetchCompanyByEmail,getMe,emailUpdate,
-    phoneUpdate,deleteComp} from '../controller/recruiterController.js'
-import {protectRecruiter,restrictRecruiterTo} from '../controller/recruiterAuthController.js'
-import {recruiterRouter} from './recruiterAuthRouter.js'
-const recruiterRouters = express.Router();
+import {recruiterUpdate,fetchRecruiterByEmail,getMe,emailUpdate,
+    phoneUpdate,deleRecruiter} from '../controller/recruiterController.js'
+import {recruiterAuthRouter} from './recruiterAuthRouter.js'
+import  {protect,restrictTo} from '../auth/auth.js'
+const recruiterRouter = express.Router();
 
-recruiterRouters.use('/auth',recruiterRouter)
+recruiterRouter.use('/auth',recruiterAuthRouter)
 
-recruiterRouters.use(protectRecruiter,restrictRecruiterTo('company'))
-recruiterRouters.get('/me', getMe);
-recruiterRouters.put('/update',compUpdate);
-recruiterRouters.post('/email',fetchCompanyByEmail);
-recruiterRouters.put('/email',emailUpdate);
-recruiterRouters.put('/phone',phoneUpdate);
-recruiterRouters.delete('/delete',deleteComp);
+recruiterRouter.use(protect,restrictTo('recruiter'))
+
+recruiterRouter.get('/me', getMe);
+recruiterRouter.put('/update',recruiterUpdate);
+recruiterRouter.post('/email',fetchRecruiterByEmail);
+recruiterRouter.put('/email',emailUpdate);
+recruiterRouter.put('/phone',phoneUpdate);
+recruiterRouter.delete('/delete',deleRecruiter);
 
 export{recruiterRouter};

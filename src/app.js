@@ -2,17 +2,14 @@ import {config} from 'dotenv'
 config();
 import express from 'express';
 
-import {userAuthRouter} from './routers/userAuthRouter.js'
 import {postRouter} from './routers/postRoute.js'
 import { jobRouter } from './routers/jobRouter.js';
-import { jobAppRouter} from './routers/jobAppRouter.js';
 import { userRouter } from './routers/userRouter.js';
 import { globalErrorHandler } from './controller/errorController.js';
 import { qaulifRouter } from './routers/qaulfRouter.js'
 import { AppError } from './utils/appError.js';
 import {recruiterRouter} from './routers/recruiterRouter.js'
-import {userUploadRouter} from './routers/userUploadRouter.js'
-import {recruiterUploadRouter} from './routers/recruiterUploadRouter.js'
+import {uploadImgRouter,uploadPdfRouter} from './routers/uploadRouter.js'
 import limit from 'express-rate-limit'
 import helmet from 'helmet'
 import cors from 'cors'
@@ -44,15 +41,14 @@ app.use(helmet());
 app.use('/api',limiter);
 app.set('trust proxy',['52.41.36.82','54.191.253.12','44.226.122.3'])
 
-app.use('/api/v1/users/auth',userAuthRouter);
+
 app.use('/api/v1/posts',postRouter);
 app.use('/api/v1/jobs',jobRouter);
-app.use('/api/v1/jobs/application',jobAppRouter)
 app.use('/api/v1/users',userRouter)
 app.use('/api/v1/users/qualifications',qaulifRouter);
 app.use('/api/v1/recruiters',recruiterRouter);
-app.use('/api/v1/recruiters/uploads/img',recruiterUploadRouter);
-app.use('/api/v1/users/uploads/img',userUploadRouter);
+app.use('/api/v1/uploads/img',uploadImgRouter);
+app.use('/api/v1/uploads/pdf',uploadPdfRouter);
 
 app.all('/*',(req,resp,next)=>{
     return next(new AppError(

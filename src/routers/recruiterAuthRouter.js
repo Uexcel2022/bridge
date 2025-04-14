@@ -1,15 +1,16 @@
 import express from 'express'
-import {changePwd,recruiterLogin,protectRecruiter,restrictRecruiterTo,
-    recruiterSignup,forgetPassword,resetPassword} from '../controller/recruiterAuthController.js'
+import {changePwd,recruiterLogin,
+    recruiterSignup,forgotPassword,resetPassword} from '../controller/recruiterAuthController.js'
+import {protect,restrictTo} from '../auth/auth.js'
 
-const recruiterRouter = express.Router()
+const recruiterAuthRouter = express.Router()
 
-recruiterRouter.post('/login',recruiterLogin);
-recruiterRouter.post('/signup',recruiterSignup);
-recruiterRouter.post('/forgetPassword',forgetPassword)
-recruiterRouter.post('/resetPassword/:token',resetPassword)
+recruiterAuthRouter.post('/login',recruiterLogin);
+recruiterAuthRouter.post('/signup',recruiterSignup);
+recruiterAuthRouter.post('/forgetPassword',forgotPassword)
+recruiterAuthRouter.post('/resetPassword/:token',resetPassword)
 
-recruiterRouter.use(protectRecruiter,restrictRecruiterTo('recruiter'))
-recruiterRouter.post('/changePassword',changePwd)
+recruiterAuthRouter.use(protect,restrictTo('recruiter'))
+recruiterAuthRouter.post('/changePassword',changePwd)
 
-export {recruiterRouter}
+export {recruiterAuthRouter}

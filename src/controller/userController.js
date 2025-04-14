@@ -1,10 +1,10 @@
-import {addCv, deleteCv, removeUserEmail,userAddEmail,userUpdateAbout,userUpdateName,
-    userUpdatePhoneNumber,userUpdatePhoto,deleteUser} from "../services/userService.js";
+import {removeUserEmail,userAddEmail,userUpdateAbout,userUpdateName,
+    userUpdatePhoneNumber,deleteUser} from "../services/userService.js";
 import { AppError } from "../utils/appError.js";
 import {catchReqResAsync} from '../utils/catchAsyn.js'
 import {options,emailValidation,
     userNameValidation,PhoneValidation,} from '../validation/userValidation.js'
-import {fieldFilter} from '../utils/firldsFilter.js'
+import {fieldFilter} from '../utils/fieldsFilter.js'
 
 export const addUserEmail = catchReqResAsync(async(req,resp,next)=>{
     
@@ -94,55 +94,6 @@ export const updatePhoneNumber = catchReqResAsync(async(req,resp,next)=>{
     }})
 })
 
-export const updatePhoto = catchReqResAsync (async(req,resp,next)=>{
-    if(!req.body.photo){
-        return next(new AppError('Please provide photo name.',400));
-    }
-    req.body.id = req.user.id
-    const updatedUser = await userUpdatePhoto(req.body)
-    resp.status(200).json({
-        status: 'success',
-        data:{
-            user: await fieldFilter(updatedUser)
-        }
-    })
-})
-
-
-export const uploadCv = catchReqResAsync(async(req,resp,next)=>{
-    if(!req.body.cv){
-        return next(new AppError('Please provide cv.',400))
-    }
-    
-    if(req.body.cv.split('.')[1]!=="pdf"){
-        return next(new AppError('Please provide pdf document',400))
-    }
-
-    req.body.id = req.user.id;
-    const updatedUser = await addCv(req.body);
-    resp.status(200).json({
-        status: 'success',
-        data:{
-            user: await fieldFilter(updatedUser)
-        }
-    })
-})
-
-
-export const removeCv = catchReqResAsync(async(req,resp,next)=>{
-    if(!req.params.index){
-        return next(new AppError('Please provide cv.',400))
-    }
-    const updateObj = {id: req.user.id, index: req.params.index*1}
-    const updatedUser = await deleteCv(updateObj);
-    resp.status(200).json({
-        status: 'success',
-        data:{
-            user: await fieldFilter(updatedUser)
-        }
-    })
-
-})
 
 
 export const deleteOneUser = catchReqResAsync(async (req,resp,next)=>{

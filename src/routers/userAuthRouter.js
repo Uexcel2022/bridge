@@ -1,7 +1,7 @@
 import express from 'express'
 import { signupUser, getMe,fetchUserByEmail,
-    loginUser,protectUser,changePwd,forgetPassword,resetPassword, 
-    restrictUserTo} from '../controller/userAuthController.js'
+    loginUser,changePwd,forgetPassword,resetPassword} from '../controller/userAuthController.js'
+import {protect,restrictTo} from '../auth/auth.js'
 
 const userAuthRouter = express.Router()
 
@@ -10,7 +10,7 @@ userAuthRouter.post('/signup',signupUser);
 userAuthRouter.post('/forgetPassword',forgetPassword)
 userAuthRouter.post('/resetPassword/:token',resetPassword)
 
-userAuthRouter.use(protectUser,restrictUserTo('user'))
+userAuthRouter.use(protect,restrictTo('user'))
 
 userAuthRouter.get('/me',getMe);
 userAuthRouter.post('/email',fetchUserByEmail)

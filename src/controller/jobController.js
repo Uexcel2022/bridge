@@ -1,10 +1,10 @@
 import { postJob,jobSearch, findPostedJobs,findAllPostedJobs,
     clasedAndOpenJob,findCloseJobs,findJob,updateJob} from "../services/jobService.js";
 import {catchReqResAsync} from '../utils/catchAsyn.js'
-import {fieldFilter} from '../utils/firldsFilter.js'
+import {fieldFilter} from '../utils/fieldsFilter.js'
 
 export const createJob = catchReqResAsync(async(req,resp,next)=>{
-    req.body.recruiter = req.recruiter.id;
+    req.body.id = req.recruiter.id;
     const newJob = await postJob(req.body);
     newJob.recruiter = await fieldFilter(newJob.recruiter)
     resp.status(201).json({
@@ -68,7 +68,7 @@ export const closeOrOpendJob = catchReqResAsync(async(req,resp,next)=>{
 })
 
 export const getClosedJobs = catchReqResAsync(async(req,resp,next)=>{
-    const res = await findCloseJobs(req.company.id);
+    const res = await findCloseJobs(req.recruiter.id);
     resp.status(200).json({
         results: res.length,
         status: 'success',

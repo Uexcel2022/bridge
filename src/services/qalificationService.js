@@ -3,48 +3,95 @@ import {catchDBAsync} from '../utils/catchAsyn.js'
 import { AppError } from "../utils/appError.js";
 import { timeZone } from "../utils/timeZone.js";
 
-const prisma = new PrismaClient();
-
-export const createQualification = catchDBAsync (async(qualifs) =>{
-    const newQual = await prisma.qualifications.create({ 
-        data:{
-            school: qualifs.school,
-            qualification: qualifs.qualification,
-            createdAt: await timeZone(),
-            user:{
-                connect : {id: qualifs.userId}
-            }
+const prisma = new PrismaClient({
+    omit: {
+        qualifications: {
+        createdAt: true,
+        updatedAt: true,
         },
-        include:{
-            user: true
+        user:{
+           password: true,
+           passwordChangeAt: true,
+           createdAt: true,
+           updatedAt: true,
+           passwordChangeToken: true,
+           passwordChangeTokenExpires: true,
+           role: true
         }
+    }
+});
+
+export const createQualification = catchDBAsync (async(userData) =>{
+    const newQulif = prisma.$transaction(async (prisma) => {
+        const qualif = await getQalif(userData)
+        if (qualif) {
+                throw new AppError('Qualification already exists!', 409);
+            }
+
+        return await prisma.qualifications.create({ 
+            data:{
+                school: userData.school,
+                qualification: userData.qualification,
+                createdAt: await timeZone(),
+                user:{
+                    connect : {id: userData.userId}
+                }
+            },
+            include:{
+                user: true
+            }
+        })
     })
-    return newQual;
+    return newQulif
 })
 
-export const updateQualif = catchDBAsync(async (userQualf)=>{
+export const updateQualif = catchDBAsync(async (userData)=>{
         const userupdatedQual = await prisma.$transaction(async(prisma)=>{
-            const qualif = await prisma.qualifications.findUnique({where: {id:userQualf.qfId}})
-            if(!qualif){
+            const validId = await prisma.qualifications.findUnique({where: {id:userData.qfId}})
+            if(!validId){
                 throw new AppError('No Qualification found with that ID',404)
             }
-            return prisma.qualifications.update({
-                where: {id:userQualf.qfId},
+
+            const qualif = await getQalif(userData);
+            
+            if (qualif) {
+                    throw new AppError('Qualification already exists!', 409);
+                }
+            console.log(userData)
+            return await prisma.qualifications.update({
+                where: {id: userData.qfId},
                 data:{
-                    school: userQualf.school,
-                    qualification: userQualf.qualification,
+                    school: userData.school,
+                    qualification: userData.qualification,
                     updatedAt: await timeZone(),
                     user:{
-                        connect: {id: userQualf.userId}
+                        connect: {id: userData.userId}
                     }
                 },
-                include :{user: userQualf.userId}
+                include :{user: true}
             })
         })
         return userupdatedQual
 })
 
 export const deleteQualif = catchDBAsync(async (qalfId)=>{
+    await prisma.$transaction(async(prisma)=>{
+        const validId = await prisma.qualifications.findUnique({where: {id:qalfId}})
+        if(!validId){
+            throw new AppError('Record to delete does not exist.',404)
+        }
     await prisma.qualifications.delete({where: {id: qalfId}})
+    })
 })
 
+
+const getQalif = catchDBAsync(async (userData)=>{
+    const qualif = await prisma.qualifications.findFirst({
+        where: {
+            userId: userData.userId,
+            school: userData.school,
+            qualification: userData.qualification
+        },
+    })
+   return qualif;
+})

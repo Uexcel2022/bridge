@@ -1,107 +1,104 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client-js"
 }
 
- datasource db {
+datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
-
-model User{
- id String @id @default(uuid())
- surname String 
- firstName String
- middleName String
- gender String
- phoneNumber String @unique
- primaryEmail String @unique
- email String[] @unique
- password String
- role String
- imageUrl String?
- publicId String?
- active Boolean @default(true)
- about String?
- cv String[]
- passwordChangeToken String?
- passwordChangeTokenExpires DateTime?
- passwordChangeAt DateTime?
-
- qualifications Qualifications[]
-
- jobApplication ApplyForJob []
-
- createdAt DateTime
- updatedAt DateTime?
-
+model User {
+  id                         String           @id @default(uuid())
+  surname                    String
+  firstName                  String
+  phoneNumber                String           @unique
+  primaryEmail               String           @unique
+  email                      String[]         @unique
+  password                   String
+  about                      String?
+  createdAt                  DateTime
+  updatedAt                  DateTime?
+  passwordChangeAt           DateTime?
+  gender                     String
+  middleName                 String
+  role                       String
+  passwordChangeToken        String?
+  passwordChangeTokenExpires DateTime?
+  active                     Boolean          @default(true)
+  imageUrl                   String?
+  publicId                   String?
+  jobApplication             ApplyForJob[]
+  qualifications             Qualifications[]
+  resume                     Resume[]
 }
 
-model Qualifications{
-  id String @id @default(uuid())
-  school String
+model Qualifications {
+  id            String    @id @default(uuid())
+  school        String
   qualification String
-  user User @relation(fields: [userId],references: [id], onDelete: Cascade)
-  userId String
+  userId        String
+  createdAt     DateTime
+  updatedAt     DateTime?
+  user          User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Resume {
+  id        String    @id @default(uuid())
+  imageUrl  String?
+  publicId  String?
+  userId    String
   createdAt DateTime
   updatedAt DateTime?
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
-model Recruiter{
-  id String @id @default(uuid())
-  name String
-  description String
-  email String @unique
-  phone String @unique
-  role String
-  password String?
-  imageUrl String?
-  publicId String?
-  active Boolean @default(true)
-  jobs Job[]
-  passwordChangeToken String?
+model Recruiter {
+  id                         String    @id @default(uuid())
+  name                       String
+  description                String
+  email                      String    @unique
+  phone                      String    @unique
+  role                       String
+  password                   String?
+  imageUrl                   String?
+  publicId                   String?
+  active                     Boolean   @default(true)
+  passwordChangeToken        String?
   passwordChangeTokenExpires DateTime?
-  passwordChangeAt DateTime?
-  createdAt DateTime 
-  updatedAt DateTime?
+  passwordChangeAt           DateTime?
+  createdAt                  DateTime
+  updatedAt                  DateTime?
+  jobs                       Job[]
 }
 
-model Job{
- id String @id @default(uuid())
-  title String
-  type String
+model Job {
+  id          String        @id @default(uuid())
+  title       String
+  type        String
   description String
-  location String
-  salary String
-  active Boolean @default(true)
-  recruiter Recruiter @relation(fields: [recruiterId], references: [id], onDelete: Cascade)
+  location    String
+  salary      String
+  createdAt   DateTime
+  updatedAt   DateTime?
+  active      Boolean       @default(true)
   recruiterId String
-  applicant ApplyForJob []
-  createdAt DateTime 
-  updatedAt DateTime?
+  applicant   ApplyForJob[]
+  recruiter   Recruiter     @relation(fields: [recruiterId], references: [id], onDelete: Cascade)
 }
 
-
-model ApplyForJob{
-  id String @id @default(uuid())
-  name String
+model ApplyForJob {
+  id          String    @id @default(uuid())
+  name        String
   phoneNumber String
   coverLetter String?
-  linkedin String?
-  experience Int @default(0)
-  quoteSalary Int @default(0)
-  cv String
-  job Job @relation(fields: [jobId],references: [id],onDelete: Cascade)
-  user User @relation(fields: [userId],references: [id],onDelete: Cascade)
-  userId String
-  jobId String
-  createdAt DateTime 
-  updatedAt DateTime?
-
+  linkedin    String?
+  experience  Int       @default(0)
+  quoteSalary Int       @default(0)
+  cv          String
+  userId      String
+  jobId       String
+  createdAt   DateTime
+  updatedAt   DateTime?
+  job         Job       @relation(fields: [jobId], references: [id], onDelete: Cascade)
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
 }

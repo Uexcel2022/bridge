@@ -22,7 +22,7 @@ export const getUser = catchDBAsync(async (userId)=>{
     const id = userId
     const user = await prisma.user.findUnique(
         {where:{id},
-        include:{qualifications:true}
+        include:{qualifications:true, resume:true}
     })
     if(!user){
         throw new AppError('User not found with that ID!',404)
@@ -36,7 +36,7 @@ export const getUserByEmail = catchDBAsync(async (primaryEmail)=>{
         {where:{
             primaryEmail
         },
-        include:{qualifications:true}
+        include:{qualifications:true, resume:true}
     })
 
     if(!user){
@@ -93,24 +93,6 @@ export const userUpdatePhoneNumber = catchDBAsync(async (updateObj)=>{
             where: {id: updateObj.id},
             data: {
                 phoneNumber: updateObj.phoneNumber,
-                updatedAt: await timeZone()
-            }
-        })
-    })
-
-    return updatedUser;
-})
-
-export const userUpdatePhoto = catchDBAsync(async (updateObj)=>{
-    const updatedUser = await prisma.$transaction( async (prisma)=>{
-        const user = await prisma.user.findUnique({where:{id: updateObj.id}});
-        if(!user){
-            throw new AppError('User not found with that ID!',404)
-        }
-        return await prisma.user.update({
-            where: {id: updateObj.id},
-            data: {
-                photo: updateObj.photo,
                 updatedAt: await timeZone()
             }
         })
@@ -187,7 +169,8 @@ export const pwdChange = catchDBAsync (async (user)=>{
 export const forgetPwd = catchDBAsync( async (id)=>{
     const token = crypto.randomBytes(32).toString('hex');
     const hashToken = crypto.createHash('sha256').update(token).digest('hex')
-    const expiresIn = new Date((Date.now()+(10*60*1000)))
+    const expiresIn = new Date(Date.now() 
+    + (new Date().getTimezoneOffset()*-1)*60*1000+(10*60*1000));
     await prisma.user.update({
         where: {id},
         data:{
@@ -208,52 +191,6 @@ export const getUserByPwdChangeToken = catchDBAsync(async(passwordChangeToken)=>
         }
     })
     return user;
-})
-
-export const addCv = catchDBAsync( async (updateObj)=>{
-    const updatedUser = await prisma.$transaction( async (prisma)=>{
-        const cv = [updateObj.cv];
-        const user = await prisma.user.findUnique({where:{id:updateObj.id}});
-        if(!user){
-            throw new AppError('User not found with that ID',404)
-        }
-        user.cv.map(el=>{if(!cv.includes(el)){cv.push(el)}})
-        return await prisma.user.update({
-            where: {id: updateObj.id},
-            data: {
-              cv,
-              updatedAt: await timeZone(),
-            }
-        })
-    })
-    return updatedUser;
-})
-
-export const deleteCv = catchDBAsync( async (updateObj)=>{
-    const updatedUser = await prisma.$transaction( async (prisma)=>{
-        const user = await prisma.user.findUnique({where:{id: updateObj.id}});
-        if(!user){
-            throw new AppError('User not found with that ID',404)
-        }
-        const lng = user.cv.length
-        if(lng < 1){
-            throw new AppError('You have no cv in your cv collections',400); 
-        }
-           user.cv.splice(updateObj.index,1)
-
-        if(lng === user.cv.length){
-            throw new AppError('The cv does not exist in your cv collections',404);
-        }
-        return await prisma.user.update({
-            where: {id: updateObj.id},
-            data: {
-              cv: user.cv,
-              updatedAt: await timeZone(),
-            }
-        })
-    })
-
-    return updatedUser;
 })
 
 export const deleteUser = catchDBAsync(async (userId)=>{

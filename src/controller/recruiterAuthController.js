@@ -1,5 +1,5 @@
 import {AppError} from '../utils/appError.js'
-import {forgetPwd,getRecruiter,getUserByPwdChangeToken,
+import {forgotPwd,getRecruiter,getUserByPwdChangeToken,
     pwdChange,signup,getRecruiterByEmail} from "../services/recruiterService.js";
 import {recruiterValidation,options} from '../validation/userValidation.js'
 import {catchReqResAsync} from '../utils/catchAsyn.js'
@@ -9,7 +9,7 @@ import bcrypt from 'bcryptjs'
 import jwt from 'jsonwebtoken'
 import crypto from 'crypto'
 import {sendMail} from '../utils/mail.js'
-import {fieldFilter,authFieldFilter} from '../utils/firldsFilter.js'
+import {fieldFilter} from '../utils/fieldsFilter.js'
 
 export const recruiterSignup = catchReqResAsync(async(req,resp,next)=>{
 
@@ -33,16 +33,16 @@ export const recruiterSignup = catchReqResAsync(async(req,resp,next)=>{
 
     req.body.comfirmPassword = undefined;
     req.body.password = await bcrypt.hash(req.body.password,12);
-    const newComp = await signup(req.body);
+    const newRec = await signup(req.body);
     
-    if(!newComp){
+    if(!newRec){
         next(new AppError('Could not register recruiter.',417))
     }
 
     resp.status(201).json({
         status: 'success',
         data: {
-            recruiter: await fieldFilter(newComp)
+            recruiter: await fieldFilter(newRec)
         }
     })
 })
@@ -71,54 +71,6 @@ export const recruiterLogin = catchReqResAsync( async(req,resp,next)=>{
     })
 });
 
-export const protectRecruiter = catchReqResAsync(async(req,resp,next)=>{
-    let token;
-    if(req.headers.authorization && req.headers.authorization.startsWith('Bearer ')){
-        token = req.headers.authorization.split(' ')[1]
-    }
-    
-    if(!token){
-        return next(
-            new AppError('You are not logged in. Please login to continue!',401))
-    }
-    
-    const docodedToken = await promisify(jwt.verify)(token,process.env.JWT_SECRET)
-    
-    if(docodedToken.role !== 'recruiter'){
-        console.log(`recruiterProtect: You do not have permission to perform this operation. ID: ${docodedToken.id}`)
-        return next(new AppError('You do not have permission to perform this operation.',403))    
-    }             
-    
-    const recruiter = await getRecruiter(docodedToken.id);
-
-    if(!recruiter){
-        return next(new AppError('The recruiter associated with the token does not exist', 401))
-    }
-    
-    const jwtIssuedTime = docodedToken.iat + new Date().getTimezoneOffset()*-1*60;
-     
-    if(recruiter.passwordChangeAt !== null){
-        const pwdChgTime = parseInt(recruiter.passwordChangeAt.getTime()/1000,10)
-      if(jwtIssuedTime < pwdChgTime){
-        return next(new AppError('You changed password recently. Please login again.', 401))
-      }
-    }
-    req.recruiter = await authFieldFilter(recruiter)
-    next()
-})
-
-
-export const restrictRecruiterTo = (...roles)=>{
-    return(req,resp,next)=>{
-        console.log(roles)
-        if(!roles.includes(req.recruiter.role)){
-            return next(new AppError(
-                'You do not have permission to perform this action',403)
-            )
-        }
-        next();
-    }
-}
 
 export const changePwd = catchReqResAsync(async (req,resp,next)=>{
      
@@ -141,29 +93,30 @@ export const changePwd = catchReqResAsync(async (req,resp,next)=>{
     }
 
     let recruiter = await getRecruiter(req.recruiter.id);
-
+     
     if(!await bcrypt.compare(oldPassword,recruiter.password)){
         return  next(new AppError('Invalid password!',400))
     }
     
     recruiter.password  = await bcrypt.hash(newPassword,12)
-
-    recruiter =  await pwdChange(recruiter)
-
+    
+    const updatedRecruiter =  await pwdChange(recruiter)
+     console.log(updatedRecruiter)
     resp.status(200).json({
         satatus: 'success',
         data: {
-            recruiter : await fieldFilter(recruiter)
+            recruiter : await fieldFilter(updatedRecruiter)
         }
     })
 })
 
-export const forgetPassword = catchReqResAsync (async (req,resp,next)=>{
+export const forgotPassword = catchReqResAsync (async (req,resp,next)=>{
     if(!req.body.email){
         return next(new AppError('Please provide your email.',404))
     }
     const recruiter = await getRecruiterByEmail(req.body.email);
-    const pwdChangeToken = await forgetPwd(recruiter.id);
+
+    const pwdChangeToken = await forgotPwd(recruiter.id);
 
     const url = `${req.protocol}://${req.get('host')}/api/vi/auth/resetPassword/${pwdChangeToken}`
     const message = `Forgot password? Submit a patch request with new password and comfirm password to ${url} \nIgnore if you did not innitiate password reset. Thank you.`

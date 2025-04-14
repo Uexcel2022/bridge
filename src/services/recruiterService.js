@@ -1,6 +1,8 @@
 import {PrismaClient} from '@prisma/client'
 import {catchDBAsync} from '../utils/catchAsyn.js'
 import { timeZone } from '../utils/timeZone.js'
+import { AppError } from '../utils/appError.js'
+import crypto from 'crypto'
 
 const prisma = new PrismaClient()
 
@@ -17,7 +19,7 @@ export const signup = catchDBAsync (async(recruiter)=>{
 })
 
 export const getRecruiter= catchDBAsync(async (id)=>{
-  const recruiter= await prisma.recruiter.findUnique(
+  const recruiter = await prisma.recruiter.findUnique(
       {where:{id}
   })
   if(!recruiter){
@@ -27,12 +29,8 @@ export const getRecruiter= catchDBAsync(async (id)=>{
 })
 
 export const getRecruiterByEmail = catchDBAsync(async (email)=>{
-
-  const recruiter= await prisma.recruiter.findUnique({
-    where:{
-          email
-      }
-  })
+    console.log(email)
+  const recruiter = await prisma.recruiter.findUnique({where:{email}})
 
   if(!recruiter){
       throw new AppError(`Recruiter not found with email: ${email}!`,404)
@@ -101,16 +99,16 @@ export const updateEmail = catchDBAsync(async (updateObj)=>{
   })
 
 
-export const pwdChange = catchDBAsync (async (recruiter)=>{
+export const pwdChange = catchDBAsync (async (updateData)=>{
     const updatedRecruiter= await prisma.$transaction( async (prisma)=>{
-        const recruiter= await prisma.recruiter.findUnique({where: {id: recruiter.id}});
+        const recruiter= await prisma.recruiter.findUnique({where: {id: updateData.id}});
         if(!recruiter){
             throw new AppError('Recruiter not found with that ID!',404)
         }
         return await prisma.recruiter.update({
-            where: {id: recruiter.id},
+            where: {id: updateData.id},
             data: {
-                password: recruiter.password,
+                password: updateData.password,
                 passwordChangeToken : null,
                 passwordChangeTokenExpires: null,
                 passwordChangeAt: await timeZone()
@@ -120,10 +118,12 @@ export const pwdChange = catchDBAsync (async (recruiter)=>{
     return updatedRecruiter;
 })
 
-export const forgetPwd = catchDBAsync( async (id)=>{
-    const token = crypto.randomBytes(32).toString('hex');
+export const forgotPwd = catchDBAsync( async (id)=>{
+    const token =  crypto.randomBytes(32).toString('hex');
     const hashToken = crypto.createHash('sha256').update(token).digest('hex')
-    const expiresIn = new Date(await timeZone()+10*60*60*1000)
+    const expiresIn =  new Date(Date.now() 
+    + (new Date().getTimezoneOffset()*-1)*60*1000+(10*60*1000))
+
     await prisma.recruiter.update({
         where: {id},
         data:{
@@ -131,6 +131,7 @@ export const forgetPwd = catchDBAsync( async (id)=>{
             passwordChangeTokenExpires: expiresIn
         }
     })
+    console.log(token)
     return token;
 })
 

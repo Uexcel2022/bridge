@@ -19,17 +19,17 @@ import {catchDBAsync} from '../utils/catchAsyn.js'
 import { AppError } from "../utils/appError.js";
 
 
-export const postJob = catchDBAsync( async(job)=>{
+export const postJob = catchDBAsync( async(jobData)=>{
     const newJob = await  prisma.job.create({
         data:{
-            title: job.title,
-            type: job.type,
-            description: job.description,
-            location: job.location,
-            salary: job.salary,
+            title: jobData.title,
+            type: jobData.type,
+            description: jobData.description,
+            location: jobData.location,
+            salary: jobData.salary,
             createdAt: await timeZone(),
             recruiter: {
-                connect: {id: job.recruiterId},
+                connect: {id: jobData.id},
             }
         },
         include:{

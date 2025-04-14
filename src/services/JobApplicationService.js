@@ -47,7 +47,7 @@ export const getJobApplications = catchDBAsync(async(queryData)=>{
         },
         orderBy: {createdAt : 'desc'}
     })
-    if(app.length===0){
+    if(rs.length===0){
         throw new AppError('There is no application for this job!',404);
     }
    return rs;
@@ -60,7 +60,7 @@ export const deleteJobApplications = catchDBAsync(async(jobId)=>{
             });
 
             if(app.length===0){
-                throw new AppError('No application for this job!',404);
+                throw new AppError('There is no application for this job!',404);
             }
             await prisma.applyForJob.deleteMany({
                 where: {id: jobId}
