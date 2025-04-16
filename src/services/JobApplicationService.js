@@ -23,10 +23,10 @@ export const createJobApp = catchDBAsync( async(applicant)=>{
     const jobApp = await prisma.$transaction(async(prisma)=>{
 
         const job = await prisma.job.findUnique({
-            where: {id: applicant.jobId, active: true},
+            where: {id: applicant.jobId},
         });
 
-        if(!job){
+        if(!job || job.active === false){
             throw new AppError('Job not found!',404);
         }
     
@@ -48,7 +48,7 @@ export const createJobApp = catchDBAsync( async(applicant)=>{
             }
         })
     }) 
-    
+
     return jobApp;
 })
 
