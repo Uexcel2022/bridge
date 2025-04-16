@@ -6,7 +6,7 @@
     "build": "npm install",
     "pre-deploy-command": "npx prisma migrate deploy",
     "dev": "node --watch src/server.js",
-    "start": "node src/server.js && npx prisma migrate deploy"
+    "start": "npx prisma migrate deploy && node src/server.js"
   },
   "keywords": [],
   "author": "",
