@@ -26,7 +26,7 @@ export const createJobApp = catchDBAsync( async(applicant)=>{
             where: {id: applicant.jobId},
         });
 
-        if(!job || job.active === false){
+        if(!job || !job.active){
             throw new AppError('Job not found!',404);
         }
     
@@ -44,7 +44,7 @@ export const createJobApp = catchDBAsync( async(applicant)=>{
              }
             },
             include:{
-                ob: true
+                job: true
             }
         })
     }) 
