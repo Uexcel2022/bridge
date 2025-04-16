@@ -1419,7 +1419,7 @@ paths:
     put:
       tags:
         - UploadFile
-      summary: Upload Img
+      summary: Remove Img
       description: >-
         This API is use to remove image file.
       security:
@@ -1484,7 +1484,7 @@ paths:
     put:
       tags:
         - UploadFile
-      summary: Upload Img
+      summary: Remove file
       description: >-
         This API is use to remove image file.
       security:
