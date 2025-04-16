@@ -3,9 +3,9 @@
   "version": "1.0.0",
   "main": "src/server.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "start:dev": "node --watch src/server.js",
-    "start:prod": "set NODE_ENV=prod && node --watch --env-file=config.env src/server.js"
+    "build": "npm install",
+    "dev": "node --watch server.js",
+    "start": "node server.js"
   },
   "keywords": [],
   "author": "",
