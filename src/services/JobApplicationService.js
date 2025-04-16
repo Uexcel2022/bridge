@@ -20,7 +20,17 @@ const prisma = new PrismaClient({
 });
 
 export const createJobApp = catchDBAsync( async(applicant)=>{
-    const newJobApp = await prisma.applyForJob.create({
+    const jobApp = await prisma.$transaction(async(prisma)=>{
+
+        const job = await prisma.job.findUnique({
+            where: {id: applicant.jobId, active: true},
+        });
+
+        if(!job){
+            throw new AppError('Job not found!',404);
+        }
+    
+        return await prisma.applyForJob.create({
         data: {
             name: applicant.name,
             phoneNumber: applicant.phoneNumber,
@@ -29,16 +39,17 @@ export const createJobApp = catchDBAsync( async(applicant)=>{
             user: {
                connect: {id: applicant.userId}
             },
-
             job: {
                 connect: {id: applicant.jobId}
              }
-        },
-        include:{
-            job: true
-        }
-    })
-    return newJobApp;
+            },
+            include:{
+                ob: true
+            }
+        })
+    }) 
+    
+    return jobApp;
 })
 
 export const getJobApplications = catchDBAsync(async(queryData)=>{
