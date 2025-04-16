@@ -2,7 +2,7 @@ import {AppError} from '../utils/appError.js'
 import { createUser,getUser, getUserByEmail,pwdChange,forgetPwd,
     getUserByPwdChangeToken} from "../services/userService.js";
 import {userValidation,options} from '../validation/userValidation.js'
-import {catchReqResAsync} from '../utils/catchAsyn.js'
+import {catchReqResAsync} from '../utils/catchAsync.js'
 import {promisify} from 'util'
 import bcrypt from 'bcryptjs'
 import jwt from 'jsonwebtoken'

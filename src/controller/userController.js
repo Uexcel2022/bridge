@@ -1,7 +1,7 @@
 import {removeUserEmail,userAddEmail,userUpdateAbout,userUpdateName,
     userUpdatePhoneNumber,deleteUser} from "../services/userService.js";
 import { AppError } from "../utils/appError.js";
-import {catchReqResAsync} from '../utils/catchAsyn.js'
+import {catchReqResAsync} from '../utils/catchAsync.js'
 import {options,emailValidation,
     userNameValidation,PhoneValidation,} from '../validation/userValidation.js'
 import {fieldFilter} from '../utils/fieldsFilter.js'

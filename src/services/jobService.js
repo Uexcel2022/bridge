@@ -15,7 +15,7 @@ const prisma = new PrismaClient({
     }
 });
 
-import {catchDBAsync} from '../utils/catchAsyn.js'
+import {catchDBAsync} from '../utils/catchAsync.js'
 import { AppError } from "../utils/appError.js";
 
 

@@ -1,5 +1,5 @@
 import {createQualification,updateQualif,deleteQualif} from '../services/qalificationService.js'
-import {catchReqResAsync} from '../utils/catchAsyn.js'
+import {catchReqResAsync} from '../utils/catchAsync.js'
 
 export const createQualif = catchReqResAsync(async(req,res,next)=>{
     req.body.userId = req.user.id;

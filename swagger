@@ -1,0 +1,1516 @@
+openapi: 3.0.0
+info:
+  title: Bridge
+  description: >-
+    # 🚀 Bridge is a Job Site Host Site 
+
+
+    We connect employer and prospective job candidate affording both to connect with ease.
+
+
+    ## 🔖 **How to use this template**
+
+
+    #### **Step 1: Send requests**
+
+
+    RESTful APIs allow you to perform CRUD operations using the POST, GET, PUT,
+    and DELETE HTTP methods.
+
+
+    This collection contains each of these
+    [request](https://learning.postman.com/docs/sending-requests/requests/)
+    types. Open each request and click "Send" to see what happens.
+
+
+    #### **Step 2: View responses**
+
+
+    Observe the response tab for status code (200 OK), response time, and size.
+
+
+    #### **Step 3: Send new Body data**
+
+
+    Update or add new data in "Body" in the POST request. Typically, Body data
+    is also used in PUT request.
+
+
+    ```
+
+    {
+        "name": "Add your name in the body"
+    }
+
+     ```
+
+    #### **Step 4: Update the variable**
+
+
+    Variables enable you to store and reuse values in Postman. We have created a
+    [variable](https://learning.postman.com/docs/sending-requests/variables/)
+    called `base_url` with the sample request
+    [https://postman-api-learner.glitch.me](https://postman-api-learner.glitch.me).
+    Replace it with your API endpoint to customize this collection.
+
+
+    #### **Step 5: Add tests in the "Scripts" tab**
+
+
+    Adding tests to your requests can help you confirm that your API is working
+    as expected. You can write test scripts in JavaScript and view the output in
+    the "Test Results" tab.
+
+
+   
+  version: 1.0.0
+servers:
+  - url: http://localhost:4000
+  - url: http://{{baseurl}}
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+    noauthAuth:
+      type: http
+      scheme: noauth
+security:
+  - bearerAuth: []
+tags:
+  - name: User
+  - name: Recruiters
+    description: Recruters
+  - name: Job
+  - name: JobApp
+  - name: Qualification
+  - name: UploadFile
+paths:
+  /api/v1/users/auth/me:
+    get:
+      tags:
+        - User
+      summary: GetUserById
+      description: >-
+        This GET request is used by logged ib user to get personal data from the endpoint. No request body.
+
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+        '401':
+          description: Unauthorized
+          content:
+            application/json: {}
+        '403':
+          description: Forbidden
+          content:
+            application/json: {}
+        '500':
+          description: Internal Server Error
+          content:
+            application/json: {}
+  /api/v1/users/auth/email:
+    post:
+      tags:
+        - User
+      summary: GetUserByEmail
+      description: >-
+        This GET request is use to get users by their email address.
+
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              example:
+                primaryEmail: uexcel60@gmail.com
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+        '401':
+          description: Unauthorized
+          content:
+            application/json: {}
+        '403':
+          description: Forbidden
+          content:
+            application/json: {}
+        '404':
+          description: Not Found
+          content:
+            application/json: {}
+        '500':
+          description: Internal Server Error
+          content:
+            application/json: {}
+  /api/v1/users/auth/signup:
+    post:
+      tags:
+        - User
+      summary: Signup
+      description: >-
+        This is a POST request, submitting user data to an API via the request body.
+        This request submits JSON data, and the data is reflected in the
+        response.
+
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              example:
+                surname: uche
+                firstName: madu
+                middleName: Cane
+                phoneNumber: '07037253180'
+                primaryEmail: uexcel60@gmail.com
+                password: Password1#
+                comfirmPassword: Password1#
+                gender: female
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json: {}
+        '400':
+          description: Bad Request
+          content:
+            application/json: {}
+        '500':
+          description: Internal Server Error
+          content:
+            application/json: {}
+  /api/v1/users/delete:
+    patch:
+      tags:
+        - User
+      summary: DeleteUser
+      description: >-
+        This is a PATCH request, and it is used to deativate user.
+
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              example: ''
+      security:
+        - bearerAuth: []
+      responses:
+        '204':
+          description: No Content
+          
+        '404':
+          description: Not Found
+          content:
+            application/json: {}
+        '403':
+          description: Forbidden
+          content:
+            application/json: {}
+            
+        '500':
+          description: Internal Server Error
+          content:
+            application/json: {}
+  /api/v1/users/name:
+    patch:
+      tags:
+        - User
+      summary: UpdateName
+      description: >-
+        This is a PATCH request and it is used to by users to update their name.
+
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              example:
+                surname: Aboki
+                firstName: Charlse
+                middleName: Francis
+                gender: male
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json: {}
+        '404':
+          description: Not Found
+          content:
+            application/json: {}
+        '400':
+          description: Bad Request
+          content:
+            application/json: {}
+        '403':
+          description: Forbidden
+          content:
+            application/json: {}
+            
+        '500':
+          description: Internal Server Error
+          content:
+            application/json: {}
+  /api/v1/users/phoneNumber:
+    patch:
+      tags:
+        - User
+      summary: UpdatePhone
+      description: >-
+        This is a PATCH request and it is used to by users to update their phone number.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              example:
+                phoneNumber: '08036783464'
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json: {}
+        '400':
+          description: Bad Request
+          content:
+            application/json: {}
+        '403':
+          description: Forbidden
+          content:
+            application/json: {}
+            
+        '500':
+          description: Internal Server Error
+          content:
+            application/json: {}
+  /api/v1/users/auth/login:
+
+    post:
+      tags:
+        - User
+      summary: Login
+      description: >-
+        This is POST request to login.
+
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              example:
+                primaryEmail: uexcel60@gmail.com
+                password: Password1#
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+        '400':
+          description: Bad Request
+          content:
+            application/json: {}
+            
+  /api/v1/users/auth/changePassword:
+    post:
+      tags:
+        - User
+      summary: ChangePwd
+      description: >-
+        This is a POST request and it is used to by users to change password.
+
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              example:
+                oldPassword: newPassword
+                newPassword: password
+                comfirmPassword: password
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json: {}
+        '400':
+          description: Bad Request
+          content:
+            application/json: {}
+        '403':
+          description: Forbidden
+          content:
+            application/json: {}
+            
+        '500':
+          description: Internal Server Error
+          content:
+            application/json: {}
+  /api/v1/users/email:
+    patch:
+      tags:
+        - User
+      summary: AddEmail
+      description: >-
+        This is a PATCH request and it is used to by users to add email in the form of update.
+
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              example:
+                email: champion182@gmail.com
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json: {}
+        '400':
+          description: Bad Request
+          content:
+            application/json: {}
+        '403':
+          description: Forbidden
+          content:
+            application/json: {}
+            
+        '500':
+          description: Internal Server Error
+          content:
+            application/json: {}
+  /api/v1/users/email/{emailIndex}:
+    patch:
+      tags:
+        - User
+      summary: RemoveEmail
+      parameters:
+      - in: path
+        name: emailIndex
+        schema:
+          type: string
+        required: true
+      description: >-
+        This PATCH request deletes user secondary email specified.
+
+      requestBody:
+        content: {}
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json: {}
+        '400':
+          description: Bad Request
+          content:
+            application/json: {}
+        '404':
+          description: Bad Request
+          content:
+            application/json: {}
+        '403':
+          description: Forbidden
+          content:
+            application/json: {}
+            
+        '500':
+          description: Internal Server Error
+          content:
+            application/json: {}
+  /api/v1/users/auth/resetPassword/{passwordResetToken}:
+    post:
+      tags:
+        - User
+      summary: ResetPassword
+      parameters:
+      - in: path
+        name: passwordResetToken
+        schema:
+          type: string
+        required: true
+      description: >-
+        This POST request is used by the users to send password reset request along with password reset token.
+      
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              example:
+                newPassword: password
+                comfirmPassword: password
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json: {}
+        '400':
+          description: Bad Request
+          content:
+            application/json: {}
+        '404':
+          description: Bad Request
+          content:
+            application/json: {}
+            
+        '500':
+          description: Internal Server Error
+          content:
+            application/json: {}
+  /api/v1/users/auth/forgetPassword:
+    post:
+      tags:
+        - User
+      summary: ForgotPassword
+      description: >-
+        This POST request is used to send forget password request by the users.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              example:
+                primaryEmail: uexcel6@gmail.com
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+            
+  /api/v1/recruiters/me:
+    get:
+      tags:
+        - Recruiters
+      summary: GetRecruiterById
+      description: >-
+        This GET API gives logged in recruite access to their personal information.
+
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+        '403':
+          description: Forbidden
+          content:
+            application/json: {}
+        '500':
+          description: Internal Server Error
+          content:
+            application/json: {}
+        
+  /api/v1/recruiters/email:
+    post:
+      tags:
+        - Recruiters
+      summary: GetRecruiterByEmail
+      description: >-
+        This is API retrieve recruiters by their email .
+       
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              example:
+                email: newtek@tek.com
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+        '404':
+          description: Not Found
+          content:
+            application/json: {}
+        '403':
+          description: Forbidden
+          content:
+            application/json: {}
+        '500':
+          description: Internal Server Error
+          content:
+            application/json: {}
+    put:
+      tags:
+        - Recruiters
+      summary: UpdateEmail
+      description: >-
+        This API is used by the recruiters to update their email address
+        
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              example:
+                email: email@gmail.com
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+        '404':
+          description: Not Found
+          content:
+            application/json: {}
+        '400':
+          description: Bad Reques
+          content:
+            application/json: {}
+        '403':
+          description: Forbidden
+          content:
+            application/json: {}
+        '500':
+          description: Internal Server Error
+          content:
+            application/json: {}
+  /api/v1/recruiters/auth/signup:
+    post:
+      tags:
+        - Recruiters
+      summary: Signup
+      description: >-
+        This API is for the recuiters' sign up.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              example:
+                name: Monie point
+                description: >-
+                  NewTek solution is a leading technology company specializing
+                  in web development and degital solutions, We pride ourselves
+                  on delivering high qaulity and services to our client while
+                  fostering a collaborative and innovative environment
+                email: contact@moniepoint.com
+                phone: '07015648300'
+                password: Passwo3rd#
+                comfirmPassword: Passwo3rd#
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json: {}
+  /api/v1/recruiters/delete:
+    delete:
+      tags:
+        - Recruiters
+      summary: DeleteRecruiter
+      description: >-
+        A logged in Recruiter can use this API to delete his profile.
+      
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+        '404':
+          description: Not Found
+          content:
+            application/json: {}
+        '403':
+          description: Forbidden
+          content:
+            application/json: {}
+        '500':
+          description: Internal Server Error
+          content:
+            application/json: {}
+            
+  /api/v1/recruiters/update:
+    put:
+      tags:
+        - Recruiters
+      summary: UpdateRecruiter
+      description: >-
+        This API is used by the Recruiters to perform a number of updates
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              example:
+                name: Monie Point
+                description: >-
+                  Monit  point is a leading technology company specializing in
+                  web development and degital solutions, We pride ourselves on
+                  delivering high qaulity and services to our client while
+                  fostering a collaborative and innovative environment
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+        '404':
+          description: Not Found
+          content:
+            application/json: {}
+        '400':
+          description: Bad Reques
+          content:
+            application/json: {}
+        '403':
+          description: Forbidden
+          content:
+            application/json: {}
+        '500':
+          description: Internal Server Error
+          content:
+            application/json: {}
+  /api/v1/recruiters/phone:
+    delete:
+      tags:
+        - Recruiters
+      summary: UpdatePhone
+      description: >-
+        This API is to update phone number by the Recruiters
+
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+        '404':
+          description: Not Found
+          content:
+            application/json: {}
+        '400':
+          description: Bad Reques
+          content:
+            application/json: {}
+        '403':
+          description: Forbidden
+          content:
+            application/json: {}
+        '500':
+          description: Internal Server Error
+          content:
+            application/json: {}
+  /api/v1/recruiters/auth/login:
+    post:
+      tags:
+        - Recruiters
+      summary: Login
+      description: >-
+        This API is for the logging in of Recruiters.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              example:
+                email: email@gmail.com
+                password: Passwo3rd$
+      security:
+        - noauthAuth: []
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+        '400':
+          description: Bad Reques
+          content:
+            application/json: {}
+        '500':
+          description: Internal Server Error
+          content:
+            application/json: {}
+  /api/v1/recruiters/auth/changePassword:
+    post:
+      tags:
+        - Recruiters
+      summary: ChangePwd
+      description: >-
+        This API is used by the long Recruiter to change password
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              example:
+                oldPassword: password
+                newPassword: password
+                comfirmPassword: password
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+        '404':
+          description: Not Found
+          content:
+            application/json: {}
+        '400':
+          description: Bad Reques
+          content:
+            application/json: {}
+        '403':
+          description: Forbidden
+          content:
+            application/json: {}
+        '500':
+          description: Internal Server Error
+          content:
+            application/json: {}
+  /api/v1/recruiters/auth/resetPassword/{passwordResetToken}:
+    post:
+      tags:
+        - Recruiters
+      summary: ResetPassword
+      parameters:
+      - in: path
+        name: passwordResetToken
+        schema:
+          type: string
+        required: true
+      description: >-
+        This API is used to reset password by Recruiters sent it along with the password reset token.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              example:
+                newPassword: Passwo3rd$
+                comfirmPassword: Passwo3rd$
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+        '404':
+          description: Not Found
+          content:
+            application/json: {}
+        '400':
+          description: Bad Reques
+          content:
+            application/json: {}
+        '403':
+          description: Forbidden
+          content:
+            application/json: {}
+        '500':
+          description: Internal Server Error
+          content:
+            application/json: {}
+  /api/v1/recruiters/auth/forgetPassword:
+    post:
+      tags:
+        - Recruiters
+      summary: forgetPassword,
+      description: >-
+        This API is for sending a forgot password request.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              example:
+                email: email@gmail.com
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+        '404':
+          description: Not Found
+          content:
+            application/json: {}
+        '500':
+          description: Internal Server Error
+          content:
+            application/json: {}
+  /api/v1/jobs:
+    post:
+      tags:
+        - Job
+      summary: PostJob
+      description: >-
+        This API is to post Jobs by the Recruiters
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              example:
+                title: Junior Java developer
+                type: 'full-time  '
+                description: Looking for junior and exprienced Java Software Engineer
+                location: lagos, ikeja
+                salary: 700k - 1.5k
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+        '400':
+          description: Bad Reques
+          content:
+            application/json: {}
+        '403':
+          description: Forbidden
+          content:
+            application/json: {}
+        '500':
+          description: Internal Server Error
+          content:
+            application/json: {}
+  /api/v1/jobs/one/{jobId}:
+    put:
+      tags:
+        - Job
+      summary: UpdateJob
+      parameters:
+      - in: path
+        name: jobId
+        schema:
+          type: string
+        required: true
+      description: >-
+        This API is to update Jobs by the Recruiters
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              example:
+                title: intermediate Java developer
+                type: 'full-time  '
+                description: Looking for verseed and exprienced Java Software Engineer
+                location: lagos, ikeja
+                salary: 700k - 1.9k
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+        '404':
+          description: Not Found
+          content:
+            application/json: {}
+        '400':
+          description: Bad Reques
+          content:
+            application/json: {}
+        '403':
+          description: Forbidden
+          content:
+            application/json: {}
+        '500':
+          description: Internal Server Error
+          content:
+            application/json: {}
+    get:
+      tags:
+        - Job
+      summary: GetJob
+      parameters:
+      - in: path
+        name: jobId
+        schema:
+          type: string
+        required: true
+      description: >-
+        This API Retrieve a Job when invoked
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+        '404':
+          description: Not Found
+          content:
+            application/json: {}
+        
+        '500':
+          description: Internal Server Error
+          content:
+            application/json: {} 
+            
+    
+    
+    
+    
+  /api/v1/jobs/search:
+    get:
+      tags:
+        - Job
+      summary: SearchJob
+      description: >-
+        This API is for Job Search.
+      parameters:
+        - name: limit
+          in: query
+          schema:
+            type: integer
+          example: '5'
+        - name: page
+          in: query
+          schema:
+            type: integer
+          example: '1'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+        '404':
+          description: Not Found
+          content:
+            application/json: {}
+        '500':
+          description: Internal Server Error
+          content:
+            application/json: {}
+
+  /api/v1/jobs/me:
+    get:
+      tags:
+        - Job
+      summary: GetPostedJobs
+      description: >-
+        Recruiters use this API to retrieve personal jobs posted.
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: limit
+          in: query
+          schema:
+            type: integer
+          example: '5'
+        - name: page
+          in: query
+          schema:
+            type: integer
+          example: '1'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+        '404':
+          description: Not Found
+          content:
+            application/json: {}
+        '403':
+          description: Forbidden
+          content:
+            application/json: {}
+        '500':
+          description: Internal Server Error
+          content:
+            application/json: {}
+            
+  /api/v1/jobs/closed/{jobId}:
+    patch:
+      tags:
+        - Job
+      summary: CloseOrOpenJob
+      parameters:
+      - in: path
+        name: jobId
+        schema:
+          type: string
+        required: true
+      description: >-
+        Recruiters use this API to close or open a job offer.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              example: 'Request process successfully'
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+        '404':
+          description: Not Found
+          content:
+            application/json: {}
+        '403':
+          description: Forbidden
+          content:
+            application/json: {}
+        '500':
+          description: Internal Server Error
+          content:
+            application/json: {}
+  /api/v1/jobs/closed:
+    get:
+      tags:
+        - Job
+      summary: GetClosedJobs
+      description: >-
+        Recruiters use this API to retrieve all close jobs.
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+        '404':
+          description: Not Found
+          content:
+            application/json: {}
+        '403':
+          description: Forbidden
+          content:
+            application/json: {}
+        '500':
+          description: Internal Server Error
+          content:
+            application/json: {}
+  /api/v1/jobs/:
+    get:
+      tags:
+        - Job
+      summary: GetAllJobs
+      description: >-
+        This API retrieves all jobs.
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: limit
+          in: query
+          schema:
+            type: integer
+          example: '5'
+        - name: page
+          in: query
+          schema:
+            type: integer
+          example: '1'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+        '404':
+          description: Not Found
+          content:
+            application/json: {}
+        '500':
+          description: Internal Server Error
+          content:
+            application/json: {}
+            
+  /api/v1/jobs/application/{jobId}:
+    post:
+      tags:
+        - JobApp
+      summary: ApplyForJob
+      parameters:
+      - in: path
+        name: jobId
+        schema:
+          type: string
+        required: true
+      description: >-
+        Job seekers use this API to apply for a job.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              example:
+                name: Charlse Cane
+                phoneNumber: '08036783464'
+                experience: 5
+                quoteSalary: 500000
+                cv: charlseResume.pdf
+                cover: coverLetter
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+        '404':
+          description: Not Found
+          content:
+            application/json: {}
+        '400':
+          description: Bad Reques
+          content:
+            application/json: {}
+        '403':
+          description: Forbidden
+          content:
+            application/json: {}
+        '500':
+          description: Internal Server Error
+          content:
+            application/json: {}
+    get:
+      tags:
+        - JobApp
+      summary: GetJobApplications
+      description: >-
+        Recruiters use this API to retrieve all applications for a specific job.
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: limit
+          in: query
+          schema:
+            type: integer
+          example: '2'
+        - name: page
+          in: query
+          schema:
+            type: integer
+          example: '1'
+        - in: path
+          name: jobId
+          schema:
+            type: string
+          required: true
+        
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+        '404':
+          description: Not Found
+          content:
+            application/json: {}
+        '403':
+          description: Forbidden
+          content:
+            application/json: {}
+        '500':
+          description: Internal Server Error
+          content:
+            application/json: {}
+  # /api/v1/jobs/application/d21c5f0e-02cc-4317-b58c-9421279c977d:
+    delete:
+      tags:
+        - JobApp
+      summary: DeleteJobApplications
+      parameters:
+      - in: path
+        name: jobId
+        schema:
+          type: string
+        required: true
+      description: >-
+        Recruiters use this API to delete applications for a specific job.
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+        '404':
+          description: Not Found
+          content:
+            application/json: {}
+        '403':
+          description: Forbidden
+          content:
+            application/json: {}
+        '500':
+          description: Internal Server Error
+          content:
+            application/json: {}
+  /api/v1/users/qualifications:
+    post:
+      tags:
+        - Qualification
+      summary: CreateQaulif
+      description: >-
+        This API is use to create qualification by the Users.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              example:
+                school: university of Lagos
+                qualification: bsc management technology
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+        '400':
+          description: Bad Reques
+          content:
+            application/json: {}
+        '403':
+          description: Forbidden
+          content:
+            application/json: {}
+        '500':
+          description: Internal Server Error
+          content:
+            application/json: {}
+  /api/v1/users/qualifications/{id}:
+    patch:
+      tags:
+        - Qualification
+      summary: UpdateQaulif
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+        required: true
+      description: >-
+        This API is use to update qualification by the Users.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              example:
+                school: oxford university
+                qualification: phd accounting
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+        '404':
+          description: Not Found
+          content:
+            application/json: {}
+        '400':
+          description: Bad Reques
+          content:
+            application/json: {}
+        '403':
+          description: Forbidden
+          content:
+            application/json: {}
+        '500':
+          description: Internal Server Error
+          content:
+            application/json: {}
+    delete:
+      tags:
+        - Qualification
+      summary: DeleteQaulif
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+        required: true
+      description: >-
+        This API is use to delete qualification by the Users.
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+        '404':
+          description: Not Found
+          content:
+            application/json: {}
+        '403':
+          description: Forbidden
+          content:
+            application/json: {}
+        '500':
+          description: Internal Server Error
+          content:
+            application/json: {}
+  /api/v1/uploads/img:
+    patch:
+      tags:
+        - UploadFile
+      summary: Upload Img
+      description: >-
+        This API is use to upload image file.
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                image:
+                  type: string
+                  format: binary
+      security:
+        - bearerAuth: []
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json: {}
+        '400':
+          description: Bad Reques
+          content:
+            application/json: {}
+        '403':
+          description: Forbidden
+          content:
+            application/json: {}
+        '500':
+          description: Internal Server Error
+          content:
+            application/json: {}
+            
+    put:
+      tags:
+        - UploadFile
+      summary: Upload Img
+      description: >-
+        This API is use to remove image file.
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Successful
+          content:
+            application/json: {}
+        '404':
+          description: Not Found
+          content:
+            application/json: {}
+        '403':
+          description: Forbidden
+          content:
+            application/json: {}
+        '500':
+          description: Internal Server Error
+          content:
+            application/json: {}
+            
+  /api/v1/uploads/pdf:
+    patch:
+      tags:
+        - UploadFile
+      summary: Upload File
+      description: >-
+        This API is use to upload pdf file.
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                pdf:
+                  type: string
+                  format: binary
+      security:
+        - bearerAuth: []
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json: {}
+        '400':
+          description: Bad Reques
+          content:
+            application/json: {}
+        '417':
+          description: Fail
+          content:
+            application/json: {}
+        '403':
+          description: Forbidden
+          content:
+            application/json: {}
+        '500':
+          description: Internal Server Error
+          content:
+            application/json: {}
+    put:
+      tags:
+        - UploadFile
+      summary: Upload Img
+      description: >-
+        This API is use to remove image file.
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Successful
+          content:
+            application/json: {}
+        '404':
+          description: Not Found
+          content:
+            application/json: {}
+        '417':
+          description: Fail
+          content:
+            application/json: {}
+        '403':
+          description: Forbidden
+          content:
+            application/json: {}
+        '500':
+          description: Internal Server Error
+          content:
+            application/json: {}
+  
+
+  
+            

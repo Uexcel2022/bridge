@@ -1,5 +1,5 @@
 import { getRecruiter } from "../services/recruiterService.js";
-import { catchReqResAsync } from "../utils/catchAsyn.js";
+import { catchReqResAsync } from "../utils/catchAsync.js";
 import {promisify} from 'util'
 import jwt from 'jsonwebtoken'
 import { getUser } from "../services/userService.js";
@@ -52,7 +52,6 @@ export const protect = catchReqResAsync(async(req,resp,next)=>{
 export const restrictTo = (...roles)=>{
     return(req,resp,next)=>{
        const role = req.user? req.user.role : req.recruiter.role
-       console.log(role+"********************")
         if(!roles.includes(role)){
             return next(new AppError(
                 'You do not have permission to perform this action',403)

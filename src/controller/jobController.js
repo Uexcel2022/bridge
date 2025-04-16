@@ -1,6 +1,6 @@
 import { postJob,jobSearch, findPostedJobs,findAllPostedJobs,
     clasedAndOpenJob,findCloseJobs,findJob,updateJob} from "../services/jobService.js";
-import {catchReqResAsync} from '../utils/catchAsyn.js'
+import {catchReqResAsync} from '../utils/catchAsync.js'
 import {fieldFilter} from '../utils/fieldsFilter.js'
 
 export const createJob = catchReqResAsync(async(req,resp,next)=>{

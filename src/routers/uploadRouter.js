@@ -1,10 +1,10 @@
 import express from 'express'
-import { imageUpload,resumeUpload } from '../controller/fileUploadController.js'
+import { imageUpload,resumeUpload,deleteImg } from '../controller/fileUploadController.js'
 import {protect,restrictTo} from '../auth/auth.js'
 import {sizeLimit} from '../utils/uploadMiddleware.js'
 const uploadImgRouter = express.Router();
 uploadImgRouter.use(protect,restrictTo('user','recruiter'),sizeLimit.single('image'))
-uploadImgRouter.route('/').patch(imageUpload);
+uploadImgRouter.route('/').patch(imageUpload).put(deleteImg);
 
 
 const uploadPdfRouter = express.Router();

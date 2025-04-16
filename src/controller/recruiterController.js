@@ -2,7 +2,7 @@ import {getRecruiter,getRecruiterByEmail,deleteRecruiter,
     updatePhone,updateEmail,
     updateRecruiter} from '../services/recruiterService.js'
 import { AppError } from '../utils/appError.js'
-import {catchReqResAsync} from '../utils/catchAsyn.js'
+import {catchReqResAsync} from '../utils/catchAsync.js'
 import {emailValidation,PhoneValidation,options} from '../validation/userValidation.js'
 import {fieldFilter} from '../utils/fieldsFilter.js'
 

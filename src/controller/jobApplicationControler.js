@@ -1,6 +1,6 @@
 
 import { createJobApp, getJobApplications,deleteJobApplications} from "../services/JobApplicationService.js";
-import {catchReqResAsync} from '../utils/catchAsyn.js'
+import {catchReqResAsync} from '../utils/catchAsync.js'
 export const applyForJob = catchReqResAsync( async (req,resp,next)=>{
     //would have to send below info from from end will applying for a job
     const body = req.body;
@@ -25,12 +25,12 @@ export const applyForJob = catchReqResAsync( async (req,resp,next)=>{
 export const fetchJobApplications = catchReqResAsync(async (req,resp,next)=>{
     const queryData = {page: req.query.page*1, limit: req.query.limit*1};
     queryData.id =  req.params.id;
-    const results = await getJobApplications(queryData);
+    const applications = await getJobApplications(queryData);
     resp.status(200).json({
-        results: results.length,
+        results: applications.length,
         status: 'success',
         data:{
-         results
+            applications
         }
     })
 })

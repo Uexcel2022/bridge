@@ -38,7 +38,6 @@ const catchDBAsync = fn => {
             console.log(err.message)
             throw new AppError('Database connection error. Please try again later.', 500)
         }
-
         console.log(err.message)
         
       }

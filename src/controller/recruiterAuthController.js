@@ -2,7 +2,7 @@ import {AppError} from '../utils/appError.js'
 import {forgotPwd,getRecruiter,getUserByPwdChangeToken,
     pwdChange,signup,getRecruiterByEmail} from "../services/recruiterService.js";
 import {recruiterValidation,options} from '../validation/userValidation.js'
-import {catchReqResAsync} from '../utils/catchAsyn.js'
+import {catchReqResAsync} from '../utils/catchAsync.js'
 import {isStrongPassword} from '../utils/checkPassword.js'
 import {promisify} from 'util'
 import bcrypt from 'bcryptjs'
