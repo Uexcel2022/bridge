@@ -56,6 +56,17 @@ export const loginUser = catchReqResAsync( async(req,resp,next)=>{
 
     })
 
+    const cookieOptions = {
+        expires: new Date(Date.now()+process.env.COOKIE_EXPIRES_IN*24*60*60*1000),
+        httpOnly: true
+    }
+  
+    if(process.env.NODE_ENV.match(/^production$/)){
+       cookieOptions.secure = true;
+    }
+  
+    resp.cookie('jwt',token,cookieOptions)
+
     resp.status(200).json({
         satatus: 'success',
         token,

@@ -61,6 +61,18 @@ export const recruiterLogin = catchReqResAsync( async(req,resp,next)=>{
     const token = await promisify(jwt.sign)({id: recruiter.id,role: recruiter.role}, process.env.JWT_SECRET,{
         expiresIn: process.env.JWT_EXPIRES_IN
     })
+
+    const cookieOptions = {
+        expires: new Date(Date.now()+process.env.COOKIE_EXPIRES_IN*24*60*60*1000),
+        httpOnly: true
+    }
+  
+    if(process.env.NODE_ENV.match(/^production$/)){
+       cookieOptions.secure = true;
+    }
+  
+    resp.cookie('jwt',token,cookieOptions)
+    
     resp.status(200).json({
         satatus: 'success',
         token,

@@ -50,7 +50,7 @@ app.use('/api/v1/recruiters',recruiterRouter);
 app.use('/api/v1/uploads/img',uploadImgRouter);
 app.use('/api/v1/uploads/pdf',uploadPdfRouter);
 
-app.all('/*',(req,resp,next)=>{
+app.all('/*', async (req,resp,next)=>{
     return next(new AppError(
         `The given URL ${req.originalUrl} not found!`,404))
 })
