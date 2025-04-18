@@ -50,7 +50,6 @@ export const loginUser = catchReqResAsync( async(req,resp,next)=>{
         return next(new AppError('Incorrect email or password!',400));
     }
 
-
     const token = await promisify(jwt.sign)({id: user.id,role: user.role}, process.env.JWT_SECRET,{
         expiresIn: process.env.JWT_EXPIRES_IN
 
@@ -58,14 +57,17 @@ export const loginUser = catchReqResAsync( async(req,resp,next)=>{
 
     const cookieOptions = {
         expires: new Date(Date.now()+process.env.COOKIE_EXPIRES_IN*24*60*60*1000),
-        httpOnly: true
+        httpOnly: true,
+        sameSite: 'None',
+        partitioned: true,
+        path: '/'
     }
   
     if(process.env.NODE_ENV.match(/^production$/)){
        cookieOptions.secure = true;
     }
-  
-    resp.cookie('jwt',token,cookieOptions)
+
+    resp.cookie('token',token,cookieOptions)
 
     resp.status(200).json({
         satatus: 'success',
